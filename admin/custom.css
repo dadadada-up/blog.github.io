@@ -1,0 +1,75 @@
+/**
+ * Hexo Admin 自定义样式覆盖
+ */
+
+/* 设置页面样式 */
+.settings {
+  max-width: 800px !important;
+  margin: 0 auto !important;
+  padding: 20px !important;
+}
+
+.settings h1 {
+  font-size: 24px !important;
+  margin-bottom: 20px !important;
+}
+
+.settings h2 {
+  font-size: 18px !important;
+  font-weight: bold !important;
+  margin-top: 30px !important;
+  margin-bottom: 15px !important;
+  padding-bottom: 10px !important;
+  border-bottom: 1px solid #eee !important;
+}
+
+.settings p {
+  margin-bottom: 15px !important;
+}
+
+.settings div > label {
+  display: flex !important;
+  align-items: center !important;
+  margin-bottom: 5px !important;
+  font-weight: bold !important;
+}
+
+.settings input[type="checkbox"] {
+  margin-right: 8px !important;
+  transform: scale(1.2) !important;
+}
+
+.settings input[type="text"] {
+  padding: 8px !important;
+  border: 1px solid #ddd !important;
+  border-radius: 4px !important;
+  background-color: #fff !important;
+  width: 100% !important;
+  max-width: 300px !important;
+}
+
+.settings button {
+  background-color: #0366d6 !important;
+  color: white !important;
+  border: none !important;
+  padding: 10px 15px !important;
+  border-radius: 4px !important;
+  cursor: pointer !important;
+  font-size: 16px !important;
+  transition: background-color 0.2s !important;
+  margin-top: 20px !important;
+}
+
+.settings button:hover {
+  background-color: #0256b9 !important;
+}
+
+/* 强制刷新 - 确保样式应用 */
+* {
+  animation: fadein 0.1s;
+}
+
+@keyframes fadein {
+  from { opacity: 0.99; }
+  to { opacity: 1; }
+} 
