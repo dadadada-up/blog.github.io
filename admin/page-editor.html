@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>页面编辑器 - 博客管理系统</title>
+  <link rel="stylesheet" href="/admin/css/modern-layout.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/admin-menu.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <link rel="stylesheet" href="/admin/css/unified-layout.css">
+  
+  <script src="/admin/js/api-interceptor.js"></script>
+  <script src="/admin/js/common-menu.js"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- 顶部导航栏 -->
+    <header class="admin-header">
+      <div class="admin-logo">博客管理系统</div>
+      <div class="admin-header-actions">
+        <a href="/" target="_blank" class="dashboard-button">
+          <i class="fas fa-external-link-alt"></i> 查看网站
+        </a>
+        <a href="javascript:void(0);" onclick="logout()" class="logout-button">
+          <i class="fas fa-sign-out-alt"></i> 注销
+        </a>
+      </div>
+    </header>
+    
+    <!-- 侧边导航栏 -->
+    <aside class="admin-sidebar"></aside>
+    
+    <!-- 移动端菜单按钮 -->
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 主内容区域 -->
+    <main class="admin-main">
+      <div class="page-container">
+        <div class="page-header">
+          <div class="page-title" id="pageTitle">编辑页面</div>
+          <div class="page-actions">
+            <button class="admin-btn admin-btn-success" onclick="savePage()" id="saveBtn">
+              <i class="fas fa-save"></i> 保存
+            </button>
+            <button class="admin-btn admin-btn-secondary" onclick="previewPage()" id="previewBtn">
+              <i class="fas fa-eye"></i> 预览
+            </button>
+            <button class="admin-btn admin-btn-secondary" onclick="goBack()">
+              <i class="fas fa-arrow-left"></i> 返回
+            </button>
+          </div>
+        </div>
+        
+        <div class="page-content">
+          <div class="editor-container">
+            <!-- 页面基本信息 -->
+            <div class="editor-section">
+              <h3>页面基本信息</h3>
+              <div class="form-group">
+                <label for="pageTitle">页面标题：</label>
+                <input type="text" id="pageTitleInput" class="form-input" placeholder="输入页面标题">
+              </div>
+              <div class="form-group">
+                <label for="pagePath">页面路径：</label>
+                <input type="text" id="pagePathInput" class="form-input" placeholder="例如：about/index.html" readonly>
+              </div>
+              <div class="form-group">
+                <label for="pageLayout">页面布局：</label>
+                <select id="pageLayoutSelect" class="form-select">
+                  <option value="page">默认页面</option>
+                  <option value="about">关于页面</option>
+                  <option value="links">友情链接</option>
+                  <option value="guestbook">留言板</option>
+                  <option value="custom">自定义</option>
+                </select>
+              </div>
+            </div>
+            
+            <!-- 页面内容编辑 -->
+            <div class="editor-section">
+              <h3>页面内容</h3>
+              <div class="editor-tabs">
+                <button class="tab-btn active" onclick="switchTab('markdown')">Markdown</button>
+                <button class="tab-btn" onclick="switchTab('preview')">预览</button>
+              </div>
+              
+              <div class="editor-workspace">
+                <textarea id="markdownEditor" class="markdown-editor" placeholder="在这里编写页面内容...">
+---
+title: 
+date: 
+layout: page
+---
+
+# 页面标题
+
+在这里编写页面内容...
+                </textarea>
+                <div id="previewPane" class="preview-pane" style="display: none;">
+                  <div class="preview-content">预览内容将在这里显示...</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <style>
+    .editor-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    
+    .editor-section {
+      margin-bottom: 32px;
+      background: white;
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    }
+    
+    .editor-section h3 {
+      margin: 0 0 20px 0;
+      color: #374151;
+      font-size: 18px;
+      font-weight: 600;
+      border-bottom: 2px solid #e5e7eb;
+      padding-bottom: 8px;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #374151;
+    }
+    
+    .form-input,
+    .form-select {
+      width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      font-size: 14px;
+      transition: border-color 0.2s;
+    }
+    
+    .form-input:focus,
+    .form-select:focus {
+      outline: none;
+      border-color: #3b82f6;
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+    
+    .editor-tabs {
+      display: flex;
+      gap: 4px;
+      margin-bottom: 16px;
+      border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .tab-btn {
+      padding: 12px 24px;
+      border: none;
+      background: transparent;
+      color: #6b7280;
+      font-weight: 500;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.2s;
+    }
+    
+    .tab-btn.active {
+      color: #3b82f6;
+      border-bottom-color: #3b82f6;
+    }
+    
+    .tab-btn:hover {
+      color: #374151;
+    }
+    
+    .editor-workspace {
+      position: relative;
+      height: 500px;
+      border: 1px solid #d1d5db;
+      border-radius: 6px;
+      overflow: hidden;
+    }
+    
+    .markdown-editor {
+      width: 100%;
+      height: 100%;
+      border: none;
+      padding: 16px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      font-size: 14px;
+      line-height: 1.6;
+      resize: none;
+      outline: none;
+      background: #f8fafc;
+    }
+    
+    .preview-pane {
+      width: 100%;
+      height: 100%;
+      overflow-y: auto;
+      background: white;
+    }
+    
+    .preview-content {
+      padding: 16px;
+      line-height: 1.6;
+    }
+    
+    .loading-state {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 200px;
+      color: #6b7280;
+    }
+    
+    .error-state {
+      text-align: center;
+      padding: 40px;
+      color: #dc2626;
+    }
+    
+    .success-message {
+      background: #d1fae5;
+      color: #065f46;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      border-left: 4px solid #10b981;
+    }
+    
+    .error-message {
+      background: #fee2e2;
+      color: #991b1b;
+      padding: 12px 16px;
+      border-radius: 6px;
+      margin-bottom: 16px;
+      border-left: 4px solid #dc2626;
+    }
+  </style>
+
+  <script>
+    let currentPagePath = '';
+    let originalContent = '';
+    
+    // 页面初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查登录状态
+      if (localStorage.getItem('adminLoggedIn') !== 'true') {
+        window.location.href = '/admin/login.html';
+        return;
+      }
+      
+      // 获取URL参数中的页面路径
+      const urlParams = new URLSearchParams(window.location.search);
+      currentPagePath = urlParams.get('path') || '';
+      
+      if (currentPagePath) {
+        loadPageContent(currentPagePath);
+      } else {
+        showError('未指定要编辑的页面');
+      }
+    });
+    
+    // 加载页面内容
+    async function loadPageContent(path) {
+      try {
+        document.getElementById('pageTitle').textContent = `编辑页面 - ${path}`;
+        document.getElementById('pagePathInput').value = path;
+        
+        // 模拟加载页面内容
+        const mockContent = `---
+title: ${path.includes('about') ? '关于我' : path.includes('links') ? '友情链接' : '页面标题'}
+date: ${new Date().toISOString().split('T')[0]}
+layout: ${path.includes('about') ? 'about' : path.includes('links') ? 'links' : 'page'}
+---
+
+# ${path.includes('about') ? '关于我' : path.includes('links') ? '友情链接' : '页面标题'}
+
+这里是页面内容...
+
+## 小标题
+
+段落内容示例。
+
+### 更小的标题
+
+- 列表项 1
+- 列表项 2
+- 列表项 3
+
+**粗体文本** 和 *斜体文本*
+
+\`\`\`javascript
+// 代码示例
+function example() {
+  console.log('Hello, World!');
+}
+\`\`\`
+
+> 这是一个引用块
+> 
+> 可以包含多行内容
+        `;
+        
+        document.getElementById('markdownEditor').value = mockContent;
+        originalContent = mockContent;
+        
+        // 解析页面信息
+        const frontMatterMatch = mockContent.match(/^---\n([\s\S]*?)\n---/);
+        if (frontMatterMatch) {
+          const frontMatter = frontMatterMatch[1];
+          const titleMatch = frontMatter.match(/title:\s*(.+)/);
+          const layoutMatch = frontMatter.match(/layout:\s*(.+)/);
+          
+          if (titleMatch) {
+            document.getElementById('pageTitleInput').value = titleMatch[1].trim();
+          }
+          if (layoutMatch) {
+            document.getElementById('pageLayoutSelect').value = layoutMatch[1].trim();
+          }
+        }
+        
+      } catch (error) {
+        console.error('加载页面内容失败:', error);
+        showError('加载页面内容失败，请重试');
+      }
+    }
+    
+    // 切换编辑器标签
+    function switchTab(tab) {
+      const markdownEditor = document.getElementById('markdownEditor');
+      const previewPane = document.getElementById('previewPane');
+      const tabs = document.querySelectorAll('.tab-btn');
+      
+      tabs.forEach(t => t.classList.remove('active'));
+      
+      if (tab === 'markdown') {
+        markdownEditor.style.display = 'block';
+        previewPane.style.display = 'none';
+        document.querySelector('.tab-btn[onclick="switchTab(\'markdown\')"]').classList.add('active');
+      } else if (tab === 'preview') {
+        markdownEditor.style.display = 'none';
+        previewPane.style.display = 'block';
+        document.querySelector('.tab-btn[onclick="switchTab(\'preview\')"]').classList.add('active');
+        updatePreview();
+      }
+    }
+    
+    // 更新预览
+    function updatePreview() {
+      const content = document.getElementById('markdownEditor').value;
+      const previewContent = document.querySelector('.preview-content');
+      
+      // 简单的Markdown预览（实际项目中建议使用marked.js等库）
+      let html = content
+        .replace(/^---[\s\S]*?---\n/, '') // 移除front matter
+        .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+        .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+        .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+        .replace(/\*(.*?)\*/g, '<em>$1</em>')
+        .replace(/^> (.*$)/gm, '<blockquote>$1</blockquote>')
+        .replace(/^- (.*$)/gm, '<li>$1</li>')
+        .replace(/(<li>.*<\/li>)/gs, '<ul>$1</ul>')
+        .replace(/\n\n/g, '</p><p>')
+        .replace(/^([^<].*$)/gm, '<p>$1</p>');
+      
+      previewContent.innerHTML = html;
+    }
+    
+    // 保存页面
+    async function savePage() {
+      const content = document.getElementById('markdownEditor').value;
+      const saveBtn = document.getElementById('saveBtn');
+      
+      try {
+        saveBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> 保存中...';
+        saveBtn.disabled = true;
+        
+        // 模拟保存操作
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        showSuccess('页面保存成功！');
+        originalContent = content;
+        
+      } catch (error) {
+        console.error('保存页面失败:', error);
+        showError('保存页面失败，请重试');
+      } finally {
+        saveBtn.innerHTML = '<i class="fas fa-save"></i> 保存';
+        saveBtn.disabled = false;
+      }
+    }
+    
+    // 预览页面
+    function previewPage() {
+      if (currentPagePath) {
+        let previewUrl = currentPagePath;
+        if (previewUrl.endsWith('/index.html')) {
+          previewUrl = previewUrl.replace('/index.html', '/');
+        }
+        if (!previewUrl.startsWith('/')) {
+          previewUrl = '/' + previewUrl;
+        }
+        window.open(previewUrl, '_blank');
+      }
+    }
+    
+    // 返回页面管理
+    function goBack() {
+      const content = document.getElementById('markdownEditor').value;
+      if (content !== originalContent) {
+        if (confirm('页面内容已修改，确定要离开吗？未保存的更改将丢失。')) {
+          window.location.href = '/admin/page-management.html';
+        }
+      } else {
+        window.location.href = '/admin/page-management.html';
+      }
+    }
+    
+    // 显示成功消息
+    function showSuccess(message) {
+      const container = document.querySelector('.page-content');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'success-message';
+      alertDiv.textContent = message;
+      container.insertBefore(alertDiv, container.firstChild);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 3000);
+    }
+    
+    // 显示错误消息
+    function showError(message) {
+      const container = document.querySelector('.page-content');
+      const alertDiv = document.createElement('div');
+      alertDiv.className = 'error-message';
+      alertDiv.textContent = message;
+      container.insertBefore(alertDiv, container.firstChild);
+      
+      setTimeout(() => {
+        alertDiv.remove();
+      }, 5000);
+    }
+    
+    // 登出
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 监听编辑器内容变化
+    document.addEventListener('DOMContentLoaded', function() {
+      const editor = document.getElementById('markdownEditor');
+      if (editor) {
+        editor.addEventListener('input', function() {
+          // 可以在这里添加自动保存功能
+        });
+      }
+    });
+  </script>
+</body>
+</html> 

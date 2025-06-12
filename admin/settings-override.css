@@ -1,0 +1,143 @@
+/**
+ * 设置页面样式覆盖
+ * 这个文件专门用于覆盖设置页面的英文文本
+ */
+
+/* 标题覆盖 */
+.settings h1:contains("Settings") {
+  font-size: 0 !important;
+}
+
+.settings h1:contains("Settings")::before {
+  content: "设置";
+  font-size: 24px;
+}
+
+.settings h2:contains("Editor Settings") {
+  font-size: 0 !important;
+}
+
+.settings h2:contains("Editor Settings")::before {
+  content: "编辑器设置";
+  font-size: 18px;
+}
+
+.settings h2:contains("Image Pasting Settings") {
+  font-size: 0 !important;
+}
+
+.settings h2:contains("Image Pasting Settings")::before {
+  content: "图片粘贴设置";
+  font-size: 18px;
+}
+
+/* 段落文本覆盖 */
+.settings p:contains("Set various settings") {
+  font-size: 0 !important;
+}
+
+.settings p:contains("Set various settings")::before {
+  content: "为您的管理面板和编辑器设置各种选项。";
+  font-size: 14px;
+}
+
+.settings p:contains("Hexo admin can be secured") {
+  font-size: 0 !important;
+}
+
+.settings p:contains("Hexo admin can be secured")::before {
+  content: "Hexo管理后台可以使用密码保护。";
+  font-size: 14px;
+}
+
+.settings p:contains("Hexo-admin allows you to paste images") {
+  font-size: 0 !important;
+}
+
+.settings p:contains("Hexo-admin allows you to paste images")::before {
+  content: "Hexo管理后台允许您直接将从网页或其他地方复制的图片粘贴到编辑器中。决定如何处理这些图片。";
+  font-size: 14px;
+}
+
+/* 设置项覆盖 */
+.settings label:contains("Enable line numbering") {
+  font-size: 0 !important;
+}
+
+.settings label:contains("Enable line numbering")::after {
+  content: "启用行号";
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.settings label:contains("Enable spellchecking") {
+  font-size: 0 !important;
+}
+
+.settings label:contains("Enable spellchecking")::after {
+  content: "启用拼写检查（在旧浏览器上可能有问题）";
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.settings label:contains("Always ask for filename") {
+  font-size: 0 !important;
+}
+
+.settings label:contains("Always ask for filename")::after {
+  content: "总是询问文件名";
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.settings label:contains("Overwrite images") {
+  font-size: 0 !important;
+}
+
+.settings label:contains("Overwrite images")::after {
+  content: "如果文件已存在则覆盖";
+  font-size: 14px;
+  margin-left: 8px;
+}
+
+.settings label:contains("Image directory") {
+  font-size: 0 !important;
+}
+
+.settings label:contains("Image directory")::before {
+  content: "图片目录";
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.settings label:contains("Image filename prefix") {
+  font-size: 0 !important;
+}
+
+.settings label:contains("Image filename prefix")::before {
+  content: "图片文件名前缀";
+  font-size: 14px;
+  font-weight: bold;
+}
+
+/* 链接覆盖 */
+.settings a:contains("Setup authentification") {
+  font-size: 0 !important;
+}
+
+.settings a:contains("Setup authentification")::before {
+  content: "点此设置认证";
+  font-size: 14px;
+  color: #0366d6;
+}
+
+/* 按钮覆盖 */
+.settings button:contains("Save") {
+  font-size: 0 !important;
+}
+
+.settings button:contains("Save")::before {
+  content: "保存设置";
+  font-size: 16px;
+  color: white;
+} 

@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>个人信息管理</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      line-height: 1.6;
+      color: #333;
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+    h1 {
+      border-bottom: 1px solid #eee;
+      padding-bottom: 10px;
+    }
+    .form-group {
+      margin-bottom: 15px;
+    }
+    label {
+      display: block;
+      margin-bottom: 5px;
+      font-weight: bold;
+    }
+    input[type="text"], textarea {
+      width: 100%;
+      padding: 8px;
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+    textarea {
+      height: 100px;
+    }
+    button {
+      background-color: #0366d6;
+      color: white;
+      border: none;
+      padding: 10px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .message {
+      padding: 10px;
+      margin-top: 20px;
+      border-radius: 4px;
+    }
+    .success {
+      background-color: #d4edda;
+      color: #155724;
+    }
+    .error {
+      background-color: #f8d7da;
+      color: #721c24;
+    }
+    .social-item {
+      margin-bottom: 10px;
+      display: flex;
+    }
+    .social-item input {
+      margin-right: 10px;
+    }
+    .social-item button {
+      background-color: #dc3545;
+      margin-left: 10px;
+    }
+    #addSocial {
+      background-color: #28a745;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <h1>个人信息管理</h1>
+  
+  <div id="app">
+    <div class="form-group">
+      <label for="name">名称</label>
+      <input type="text" id="name" placeholder="请输入您的名称">
+    </div>
+    
+    <div class="form-group">
+      <label for="bio">个人简介</label>
+      <textarea id="bio" placeholder="请输入您的个人简介"></textarea>
+    </div>
+    
+    <div class="form-group">
+      <label for="avatar">头像URL</label>
+      <input type="text" id="avatar" placeholder="/images/avatar.jpg">
+    </div>
+    
+    <div class="form-group">
+      <label>社交链接</label>
+      <div id="socialLinks"></div>
+      <button id="addSocial">添加社交链接</button>
+    </div>
+    
+    <button id="saveBtn">保存设置</button>
+    
+    <div id="message" class="message" style="display: none;"></div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+      // 获取元素
+      const nameInput = document.getElementById('name');
+      const bioInput = document.getElementById('bio');
+      const avatarInput = document.getElementById('avatar');
+      const socialLinksContainer = document.getElementById('socialLinks');
+      const addSocialBtn = document.getElementById('addSocial');
+      const saveBtn = document.getElementById('saveBtn');
+      const messageDiv = document.getElementById('message');
+      
+      // 社交链接数据
+      let socialLinks = [];
+      
+      // 加载当前配置
+      fetch('/api/profile')
+        .then(response => response.json())
+        .then(data => {
+          nameInput.value = data.name || '';
+          bioInput.value = data.bio || '';
+          avatarInput.value = data.avatar || '/images/avatar.jpg';
+          
+          // 加载社交链接
+          if (data.social) {
+            socialLinks = Object.entries(data.social).map(([name, url]) => ({ name, url }));
+            renderSocialLinks();
+          }
+        })
+        .catch(error => {
+          showMessage('加载配置失败: ' + error.message, 'error');
+        });
+      
+      // 渲染社交链接
+      function renderSocialLinks() {
+        socialLinksContainer.innerHTML = '';
+        
+        socialLinks.forEach((link, index) => {
+          const div = document.createElement('div');
+          div.className = 'social-item';
+          
+          const nameInput = document.createElement('input');
+          nameInput.type = 'text';
+          nameInput.placeholder = '名称 (如 GitHub)';
+          nameInput.value = link.name;
+          nameInput.onchange = (e) => {
+            socialLinks[index].name = e.target.value;
+          };
+          
+          const urlInput = document.createElement('input');
+          urlInput.type = 'text';
+          urlInput.placeholder = 'URL';
+          urlInput.value = link.url;
+          urlInput.onchange = (e) => {
+            socialLinks[index].url = e.target.value;
+          };
+          
+          const removeBtn = document.createElement('button');
+          removeBtn.textContent = '删除';
+          removeBtn.onclick = () => {
+            socialLinks.splice(index, 1);
+            renderSocialLinks();
+          };
+          
+          div.appendChild(nameInput);
+          div.appendChild(urlInput);
+          div.appendChild(removeBtn);
+          socialLinksContainer.appendChild(div);
+        });
+      }
+      
+      // 添加社交链接
+      addSocialBtn.addEventListener('click', function() {
+        socialLinks.push({ name: '', url: '' });
+        renderSocialLinks();
+      });
+      
+      // 保存设置
+      saveBtn.addEventListener('click', function() {
+        // 构建数据对象
+        const socialObj = {};
+        socialLinks.forEach(link => {
+          if (link.name && link.url) {
+            socialObj[link.name] = link.url;
+          }
+        });
+        
+        const data = {
+          name: nameInput.value,
+          bio: bioInput.value,
+          avatar: avatarInput.value,
+          social: socialObj
+        };
+        
+        // 发送到服务器
+        fetch('/api/profile', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(data)
+        })
+        .then(response => response.json())
+        .then(result => {
+          if (result.success) {
+            showMessage('保存成功！', 'success');
+          } else {
+            showMessage('保存失败: ' + result.error, 'error');
+          }
+        })
+        .catch(error => {
+          showMessage('保存失败: ' + error.message, 'error');
+        });
+      });
+      
+      // 显示消息
+      function showMessage(text, type) {
+        messageDiv.textContent = text;
+        messageDiv.className = 'message ' + type;
+        messageDiv.style.display = 'block';
+        
+        setTimeout(() => {
+          messageDiv.style.display = 'none';
+        }, 5000);
+      }
+    });
+  </script>
+</body>
+</html>

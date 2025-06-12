@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <title>管理面板 - 集成</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+    
+    .header {
+      background-color: #1a1a35;
+      color: white;
+      padding: 0 20px;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+      z-index: 100;
+    }
+    
+    .header h1 {
+      margin: 0;
+      font-size: 20px;
+      background: linear-gradient(90deg, #409EFF, #67C23A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .nav-buttons {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .nav-button {
+      padding: 6px 15px;
+      border-radius: 4px;
+      color: white;
+      text-decoration: none;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .dashboard-button {
+      background-color: #67C23A;
+      box-shadow: 0 2px 6px rgba(103, 194, 58, 0.3);
+    }
+    
+    .dashboard-button:hover {
+      background-color: #5daf34;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(103, 194, 58, 0.4);
+    }
+    
+    .logout-button {
+      background-color: #F56C6C;
+      box-shadow: 0 2px 6px rgba(245, 108, 108, 0.3);
+    }
+    
+    .logout-button:hover {
+      background-color: #e04f4f;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(245, 108, 108, 0.4);
+    }
+    
+    .content-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+    }
+    
+    .admin-iframe {
+      flex: 1;
+      border: none;
+      width: 100%;
+    }
+    
+    .access-check {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(245, 247, 250, 0.95);
+      z-index: 1000;
+      display: none;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .access-check h2 {
+      font-size: 24px;
+      color: #333;
+      margin-bottom: 20px;
+    }
+    
+    .access-check p {
+      font-size: 16px;
+      color: #666;
+      margin-bottom: 30px;
+      max-width: 500px;
+      text-align: center;
+      line-height: 1.5;
+    }
+    
+    .access-check button {
+      padding: 10px 24px;
+      background-color: #409EFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .access-check button:hover {
+      background-color: #337ecc;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
+    }
+  </style>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <!-- 访问检查层 -->
+  <div id="accessCheck" class="access-check">
+    <h2>需要登录</h2>
+    <p>您需要先登录才能访问管理后台</p>
+    <button onclick="redirectToLogin()">前往登录</button>
+  </div>
+
+  <!-- 顶部导航 -->
+  <div class="header">
+    <h1>博客管理系统</h1>
+    <div class="nav-buttons">
+      <a href="/admin/dashboard.html" target="_blank" class="nav-button dashboard-button">
+        <i class="el-icon-data-board"></i> 仪表盘
+      </a>
+      <a href="javascript:void(0);" onclick="logout()" class="nav-button logout-button">
+        <i class="el-icon-switch-button"></i> 注销
+      </a>
+    </div>
+  </div>
+  
+  <!-- 内容区域 -->
+  <div class="content-area">
+    <iframe id="adminIframe" class="admin-iframe" src="/admin/"></iframe>
+  </div>
+  
+  <script>
+    // 检查是否已登录
+    function checkAccess() {
+      const isLoggedIn = localStorage.getItem('adminLoggedIn') === 'true';
+      
+      if (!isLoggedIn) {
+        document.getElementById('accessCheck').style.display = 'flex';
+        document.getElementById('adminIframe').style.display = 'none';
+      } else {
+        document.getElementById('accessCheck').style.display = 'none';
+        document.getElementById('adminIframe').style.display = 'block';
+      }
+    }
+    
+    // 重定向到登录页面
+    function redirectToLogin() {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 注销
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 页面加载时检查访问权限
+    window.addEventListener('load', checkAccess);
+    
+    // 防止iframe循环加载
+    document.getElementById('adminIframe').onload = function() {
+      // 检查iframe是否加载了当前页面，如果是则改为加载dashboard
+      try {
+        if (this.contentWindow.location.href.includes('iframe-solution.html')) {
+          this.src = '/admin/dashboard.html';
+        }
+      } catch (e) {
+        // 跨域错误，忽略
+      }
+    };
+  </script>
+</body>
+</html> 

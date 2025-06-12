@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理页面</title>
+  <link rel="stylesheet" href="/admin/modern-admin.css">
+  
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    /* 顶部导航 */
+    .admin-header {
+      height: 50px;
+      background-color: #409EFF;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+    
+    .admin-logo {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .admin-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .admin-button {
+      padding: 5px 10px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .admin-button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* 主内容区域 */
+    .admin-content {
+      height: calc(100vh - 50px);
+      display: flex;
+    }
+    
+    /* 侧边栏 */
+    .admin-sidebar {
+      width: 200px;
+      background-color: #2c3e50;
+      overflow-y: auto;
+    }
+    
+    .admin-menu {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .admin-menu-item {
+      display: flex;
+      align-items: center;
+      padding: 12px 15px;
+      color: rgba(255, 255, 255, 0.7);
+      text-decoration: none;
+      transition: all 0.3s;
+      font-size: 14px;
+    }
+    
+    .admin-menu-item:hover, .admin-menu-item.active {
+      background-color: rgba(255, 255, 255, 0.1);
+      color: white;
+    }
+    
+    .admin-menu-icon {
+      margin-right: 10px;
+      width: 16px;
+      text-align: center;
+    }
+    
+    .admin-menu-divider {
+      height: 1px;
+      background-color: rgba(255, 255, 255, 0.1);
+      margin: 10px 0;
+    }
+    
+    /* 内容主区域 */
+    .main-area {
+      flex: 1;
+      overflow: auto;
+      padding: 20px;
+      background-color: #f5f7fa;
+    }
+    
+    /* 文章管理 */
+    .post-management {
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .post-header {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ebeef5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .post-title {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0;
+      color: #303133;
+    }
+    
+    .post-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .post-button {
+      padding: 6px 12px;
+      background-color: #409EFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+    }
+    
+    .post-button.secondary {
+      background-color: #67c23a;
+    }
+    
+    .post-list {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+    }
+    
+    .post-item {
+      padding: 15px 20px;
+      border-bottom: 1px solid #ebeef5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .post-item:last-child {
+      border-bottom: none;
+    }
+    
+    .post-info {
+      flex: 1;
+    }
+    
+    .post-name {
+      font-size: 14px;
+      color: #303133;
+      margin: 0 0 5px;
+    }
+    
+    .post-meta {
+      font-size: 12px;
+      color: #909399;
+    }
+    
+    .post-item-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .post-item-button {
+      padding: 4px 8px;
+      background-color: #f2f6fc;
+      color: #606266;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 12px;
+    }
+    
+    .post-item-button:hover {
+      background-color: #e6ebf5;
+    }
+    
+    .post-item-button.edit {
+      color: #409EFF;
+    }
+    
+    .post-item-button.delete {
+      color: #f56c6c;
+    }
+    
+    /* 加载指示器 */
+    .loading {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100px;
+      flex-direction: column;
+    }
+    
+    .spinner {
+      width: 30px;
+      height: 30px;
+      border: 3px solid rgba(64, 158, 255, 0.2);
+      border-radius: 50%;
+      border-top-color: #409EFF;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 10px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+</head>
+<body>
+  <!-- 顶部导航栏 -->
+  <header class="admin-header">
+    <div class="admin-logo" id="pageTitle">博客管理系统</div>
+    <div class="admin-actions">
+      <a href="/" target="_blank" class="admin-button">
+        <i class="fas fa-external-link-alt"></i> 查看网站
+      </a>
+      <a href="javascript:void(0);" onclick="logout()" class="admin-button">
+        <i class="fas fa-sign-out-alt"></i> 注销
+      </a>
+    </div>
+  </header>
+  
+  <!-- 主内容区域 -->
+  <div class="admin-content">
+    <!-- 侧边栏 -->
+    <div class="admin-sidebar">
+      <ul class="admin-menu">
+        <li>
+          <a href="/admin/direct-manager.html?type=post" class="admin-menu-item active" id="menuPost">
+            <i class="fas fa-file-alt admin-menu-icon"></i>
+            文章管理
+          </a>
+        </li>
+        <li>
+          <a href="/admin/direct-manager.html?type=new" class="admin-menu-item" id="menuNew">
+            <i class="fas fa-edit admin-menu-icon"></i>
+            新建文章
+          </a>
+        </li>
+        <li>
+          <a href="/admin/direct-manager.html?type=page" class="admin-menu-item" id="menuPage">
+            <i class="fas fa-copy admin-menu-icon"></i>
+            页面管理
+          </a>
+        </li>
+        <li class="admin-menu-divider"></li>
+        <li>
+          <a href="/admin/direct-manager.html?type=settings" class="admin-menu-item" id="menuSettings">
+            <i class="fas fa-cog admin-menu-icon"></i>
+            系统设置
+          </a>
+        </li>
+      </ul>
+    </div>
+    
+    <!-- 内容主区域 -->
+    <div class="main-area" id="mainArea">
+      <!-- 内容将根据选择的类型动态加载 -->
+    </div>
+  </div>
+  
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 获取URL参数
+    function getUrlParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+    
+    // 获取页面类型
+    const pageType = getUrlParam('type') || 'post';
+    
+    // 更新菜单高亮
+    function updateMenuHighlight() {
+      // 移除所有active类
+      document.querySelectorAll('.admin-menu-item').forEach(item => {
+        item.classList.remove('active');
+      });
+      
+      // 设置当前项高亮
+      const menuItem = document.getElementById('menu' + pageType.charAt(0).toUpperCase() + pageType.slice(1));
+      if (menuItem) {
+        menuItem.classList.add('active');
+      }
+    }
+    
+    // 设置页面标题
+    function updatePageTitle() {
+      let title = '博客管理';
+      switch (pageType) {
+        case 'post': title = '文章管理'; break;
+        case 'new': title = '新建文章'; break;
+        case 'page': title = '页面管理'; break;
+        case 'settings': title = '系统设置'; break;
+      }
+      
+      document.title = title + ' - 博客管理系统';
+      document.getElementById('pageTitle').textContent = title;
+    }
+    
+    // 加载文章管理内容
+    function loadPostManagement() {
+      const mainArea = document.getElementById('mainArea');
+      mainArea.innerHTML = `
+        <div class="post-management">
+          <div class="post-header">
+            <h2 class="post-title">文章列表</h2>
+            <div class="post-actions">
+              <button class="post-button" onclick="location.href='/admin/direct-manager.html?type=new'">
+                <i class="fas fa-plus"></i> 新建文章
+              </button>
+              <button class="post-button secondary">
+                <i class="fas fa-sync-alt"></i> 刷新
+              </button>
+            </div>
+          </div>
+          
+          <div id="postList">
+            <div class="loading">
+              <div class="spinner"></div>
+              <div>加载中...</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 从API获取文章数据
+      fetch('/api/unified-posts')
+        .then(response => response.json())
+        .then(result => {
+          const postListContainer = document.getElementById('postList');
+          
+          if (!result.success || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
+            postListContainer.innerHTML = `
+              <div style="text-align: center; padding: 30px;">
+                <div style="font-size: 48px; color: #dcdfe6; margin-bottom: 15px;">
+                  <i class="fas fa-file-alt"></i>
+                </div>
+                <div style="color: #909399;">暂无文章</div>
+              </div>
+            `;
+            return;
+          }
+          
+          // 处理文章数据
+          const posts = result.data.map(post => ({
+            id: post.slug || post._id || post.id,
+            title: post.title,
+            date: post.date ? (typeof post.date === 'string' ? post.date : new Date(post.date).toISOString().slice(0, 10)) : '',
+            status: post.draft ? 'draft' : 'published'
+          }));
+          
+          // 生成HTML
+          let postListHtml = '<ul class="post-list">';
+          posts.forEach(post => {
+            const statusText = post.status === 'published' ? '已发布' : '草稿';
+            const statusColor = post.status === 'published' ? '#67c23a' : '#e6a23c';
+            
+            postListHtml += `
+              <li class="post-item" data-post-id="${post.id}">
+                <div class="post-info">
+                  <h3 class="post-name">${post.title}</h3>
+                  <div class="post-meta">
+                    <span>日期: ${post.date}</span>
+                    <span style="margin-left: 10px; color: ${statusColor}">状态: ${statusText}</span>
+                  </div>
+                </div>
+                <div class="post-item-actions">
+                  <button class="post-item-button edit" onclick="location.href='/admin/direct-manager.html?type=new&id=${post.id}'">
+                    <i class="fas fa-edit"></i> 编辑
+                  </button>
+                  <button class="post-item-button delete" onclick="deletePost('${post.id}')">
+                    <i class="fas fa-trash-alt"></i> 删除
+                  </button>
+                </div>
+              </li>
+            `;
+          });
+          postListHtml += '</ul>';
+          
+          postListContainer.innerHTML = postListHtml;
+        })
+        .catch(error => {
+          console.error('获取文章数据失败:', error);
+          document.getElementById('postList').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+              <div style="color: #f56c6c; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-circle"></i> 获取文章数据失败
+              </div>
+              <button class="post-item-button" onclick="loadPostManagement()">
+                <i class="fas fa-sync"></i> 重试
+              </button>
+            </div>
+          `;
+        });
+    }
+    
+    // 加载新建文章内容
+    function loadNewPostEditor() {
+      const mainArea = document.getElementById('mainArea');
+      mainArea.innerHTML = `
+        <div class="post-management">
+          <div class="post-header">
+            <h2 class="post-title">新建文章</h2>
+            <div class="post-actions">
+              <button class="post-button">
+                <i class="fas fa-save"></i> 保存
+              </button>
+              <button class="post-button secondary">
+                <i class="fas fa-eye"></i> 预览
+              </button>
+            </div>
+          </div>
+          
+          <div style="padding: 20px;">
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: bold;">文章标题</label>
+              <input type="text" placeholder="请输入文章标题" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+            </div>
+            
+            <div style="margin-bottom: 15px;">
+              <label style="display: block; margin-bottom: 5px; font-weight: bold;">文章内容</label>
+              <textarea placeholder="请输入文章内容，支持Markdown格式" style="width: 100%; height: 300px; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px; resize: vertical;"></textarea>
+            </div>
+            
+            <div style="display: flex; gap: 15px;">
+              <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">分类</label>
+                <select style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+                  <option value="">请选择分类</option>
+                  <option value="tech">技术</option>
+                  <option value="life">生活</option>
+                  <option value="note">笔记</option>
+                </select>
+              </div>
+              
+              <div style="flex: 1;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">标签</label>
+                <input type="text" placeholder="多个标签用逗号分隔" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 加载页面管理内容
+    function loadPageManagement() {
+      const mainArea = document.getElementById('mainArea');
+      mainArea.innerHTML = `
+        <div class="post-management">
+          <div class="post-header">
+            <h2 class="post-title">页面列表</h2>
+            <div class="post-actions">
+              <button class="post-button">
+                <i class="fas fa-plus"></i> 新建页面
+              </button>
+              <button class="post-button secondary">
+                <i class="fas fa-sync-alt"></i> 刷新
+              </button>
+            </div>
+          </div>
+          
+          <div id="pageList">
+            <div class="loading">
+              <div class="spinner"></div>
+              <div>加载中...</div>
+            </div>
+          </div>
+        </div>
+      `;
+      
+      // 从API获取页面数据
+      fetch('/api/unified-pages')
+        .then(response => response.json())
+        .then(result => {
+          const pageListContainer = document.getElementById('pageList');
+          
+          if (!result.success || !result.data || !Array.isArray(result.data) || result.data.length === 0) {
+            pageListContainer.innerHTML = `
+              <div style="text-align: center; padding: 30px;">
+                <div style="font-size: 48px; color: #dcdfe6; margin-bottom: 15px;">
+                  <i class="fas fa-copy"></i>
+                </div>
+                <div style="color: #909399;">暂无页面</div>
+              </div>
+            `;
+            return;
+          }
+          
+          // 处理页面数据
+          const pages = result.data.map(page => ({
+            id: page.slug || page._id || page.id,
+            title: page.title,
+            date: page.date ? (typeof page.date === 'string' ? page.date : new Date(page.date).toISOString().slice(0, 10)) : ''
+          }));
+          
+          // 生成HTML
+          let pageListHtml = '<ul class="post-list">';
+          pages.forEach(page => {
+            pageListHtml += `
+              <li class="post-item" data-page-id="${page.id}">
+                <div class="post-info">
+                  <h3 class="post-name">${page.title}</h3>
+                  <div class="post-meta">
+                    <span>创建日期: ${page.date}</span>
+                  </div>
+                </div>
+                <div class="post-item-actions">
+                  <button class="post-item-button edit" onclick="location.href='/admin/direct-manager.html?type=new&isPage=true&id=${page.id}'">
+                    <i class="fas fa-edit"></i> 编辑
+                  </button>
+                  <button class="post-item-button delete" onclick="deletePage('${page.id}')">
+                    <i class="fas fa-trash-alt"></i> 删除
+                  </button>
+                </div>
+              </li>
+            `;
+          });
+          pageListHtml += '</ul>';
+          
+          pageListContainer.innerHTML = pageListHtml;
+        })
+        .catch(error => {
+          console.error('获取页面数据失败:', error);
+          document.getElementById('pageList').innerHTML = `
+            <div style="text-align: center; padding: 20px;">
+              <div style="color: #f56c6c; margin-bottom: 10px;">
+                <i class="fas fa-exclamation-circle"></i> 获取页面数据失败
+              </div>
+              <button class="post-item-button" onclick="loadPageManagement()">
+                <i class="fas fa-sync"></i> 重试
+              </button>
+            </div>
+          `;
+        });
+    }
+    
+    // 加载系统设置内容
+    function loadSettings() {
+      const mainArea = document.getElementById('mainArea');
+      mainArea.innerHTML = `
+        <div class="post-management">
+          <div class="post-header">
+            <h2 class="post-title">系统设置</h2>
+            <div class="post-actions">
+              <button class="post-button">
+                <i class="fas fa-save"></i> 保存设置
+              </button>
+            </div>
+          </div>
+          
+          <div style="padding: 20px;">
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 16px; margin: 0 0 15px;">基本设置</h3>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">网站标题</label>
+                <input type="text" value="我的博客" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">网站描述</label>
+                <input type="text" value="我的个人博客网站" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">网站关键词</label>
+                <input type="text" value="博客,Hexo,个人网站" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+              </div>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+              <h3 style="font-size: 16px; margin: 0 0 15px;">部署设置</h3>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">部署方式</label>
+                <select style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+                  <option value="github">GitHub Pages</option>
+                  <option value="netlify">Netlify</option>
+                  <option value="vercel">Vercel</option>
+                </select>
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">仓库地址</label>
+                <input type="text" value="https://github.com/username/blog.github.io" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+              </div>
+              
+              <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px; font-weight: bold;">分支</label>
+                <input type="text" value="main" style="width: 100%; padding: 8px; border: 1px solid #dcdfe6; border-radius: 4px;">
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    }
+    
+    // 初始化页面
+    function initPage() {
+      // 更新页面标题
+      updatePageTitle();
+      
+      // 更新菜单高亮
+      updateMenuHighlight();
+      
+      // 加载对应内容
+      switch (pageType) {
+        case 'post':
+          loadPostManagement();
+          break;
+        case 'new':
+          loadNewPostEditor();
+          break;
+        case 'page':
+          loadPageManagement();
+          break;
+        case 'settings':
+          loadSettings();
+          break;
+        default:
+          loadPostManagement();
+      }
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', initPage);
+  </script>
+</body>
+</html> 

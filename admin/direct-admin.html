@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台 - 博客管理系统</title>
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+    #root {
+      width: 100%;
+      height: 100%;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background-color: #f5f7fa;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #409EFF;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .back-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #409EFF;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+      z-index: 9999;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+  </style>
+  <!-- 直接引入hexo-myadmin的资源文件 -->
+  <script type="module" crossorigin src="/admin/assets/index-ffd5e987.js"></script>
+  <link rel="stylesheet" href="/admin/assets/index-9105ceed.css">
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 设置临时标记，防止重定向
+    sessionStorage.setItem('noRedirect', 'true');
+    
+    // 初始化函数
+    window.onload = function() {
+      // 添加返回仪表盘按钮
+      const backBtn = document.createElement('a');
+      backBtn.className = 'back-btn';
+      backBtn.href = '/admin/dashboard.html';
+      backBtn.innerText = '返回仪表盘';
+      document.body.appendChild(backBtn);
+      
+      // 隐藏加载指示器
+      setTimeout(function() {
+        const loadingEl = document.querySelector('.loading');
+        if (loadingEl) {
+          loadingEl.style.display = 'none';
+        }
+      }, 2000);
+    };
+  </script>
+</head>
+<body>
+  <div id="root">
+    <div class="loading">
+      <div class="spinner"></div>
+      <div>正在加载管理页面...</div>
+    </div>
+  </div>
+</body>
+</html> 

@@ -1,0 +1,217 @@
+// 强制修复导航栏中文显示
+document.addEventListener('DOMContentLoaded', function() {
+    // 修复导航栏菜单文字
+    const menuItems = {
+        '/': '🏠 首页',
+        '/archives/': '📁 归档', 
+        '/categories.html': '📂 分类',
+        '/about/': '❤️ 关于'
+    };
+    
+    // 删除Tags菜单项
+    const tagsMenu = document.querySelector('#nav .site-nav a[href*="tags"]');
+    if (tagsMenu) {
+        tagsMenu.parentElement.remove();
+    }
+    
+    // 确保导航栏显示
+    const nav = document.querySelector('#nav');
+    if (nav) {
+        nav.style.display = 'block';
+        nav.style.visibility = 'visible';
+    }
+    
+    // 确保文章页面显示标题
+    const postTitle = document.querySelector('#post-info h1.post-title');
+    const postInfo = document.querySelector('#post-info');
+    
+    if (postInfo && !postTitle) {
+        // 从页面标题或其他地方获取标题
+        const pageTitle = document.title.split(' | ')[0];
+        if (pageTitle && pageTitle !== '我的技术博客') {
+            const titleElement = document.createElement('h1');
+            titleElement.className = 'post-title';
+            titleElement.textContent = pageTitle;
+            postInfo.insertBefore(titleElement, postInfo.firstChild);
+        }
+    }
+    
+    // 修复右侧边栏显示
+    const asideContent = document.querySelector('#aside-content');
+    if (asideContent) {
+        asideContent.style.display = 'block';
+        asideContent.style.visibility = 'visible';
+    }
+    
+    // 等待导航栏加载完成后再修改
+    setTimeout(() => {
+        Object.keys(menuItems).forEach(href => {
+            const menuLink = document.querySelector(`#nav .menus_items .menus_item a[href="${href}"]`);
+            if (menuLink) {
+                // 清除原文字，只保留图标和中文
+                const icon = menuLink.querySelector('i');
+                menuLink.innerHTML = '';
+                if (icon) {
+                    menuLink.appendChild(icon);
+                    menuLink.innerHTML += ' ' + menuItems[href].split(' ')[1];
+                } else {
+                    menuLink.textContent = menuItems[href];
+                }
+            }
+        });
+    }, 100);
+    
+    // 修复文章页面标题显示
+    if (document.body.classList.contains('post')) {
+        // 确保导航栏在文章页面也显示
+        const pageHeader = document.querySelector('#page-header');
+        if (pageHeader) {
+            pageHeader.style.display = 'block';
+            pageHeader.style.position = 'fixed';
+            pageHeader.style.top = '0';
+            pageHeader.style.zIndex = '9999';
+        }
+        
+        // 获取文章标题
+        setTimeout(() => {
+            const articleContainer = document.querySelector('#article-container');
+            if (articleContainer) {
+                // 查找文章标题，优先级从高到低
+                const postTitle = document.querySelector('#post-info h1.post-title') || 
+                                document.querySelector('h1.post-title') || 
+                                document.querySelector('.post-title h1') || 
+                                document.querySelector('#post-info h1') ||
+                                document.querySelector('#article-container h1') ||
+                                document.title.split(' - ')[0]; // 最后使用页面标题
+                
+                const titleText = typeof postTitle === 'string' ? postTitle : (postTitle ? postTitle.textContent : '文章标题');
+                
+                // 检查是否已经存在自定义标题容器
+                if (!document.querySelector('.custom-post-header')) {
+                    // 创建新的标题容器
+                    const titleContainer = document.createElement('div');
+                    titleContainer.className = 'custom-post-header';
+                    titleContainer.innerHTML = `
+                        <div class="custom-post-title-bg">
+                            <h1 class="custom-post-title">${titleText}</h1>
+                            <div class="custom-post-meta">
+                                <span class="custom-wordcount">📝 正在计算字数...</span>
+                                <span class="custom-reading-time">⏱️ 正在计算阅读时间...</span>
+                            </div>
+                        </div>
+                    `;
+                    
+                    // 插入到文章容器前
+                    articleContainer.parentNode.insertBefore(titleContainer, articleContainer);
+                    
+                    // 计算字数和阅读时间
+                    const articleContent = articleContainer.textContent || '';
+                    const wordCount = articleContent.length;
+                    const readingTime = Math.ceil(wordCount / 300); // 假设每分钟300字
+                    
+                    setTimeout(() => {
+                        const wordcountSpan = document.querySelector('.custom-wordcount');
+                        const readingTimeSpan = document.querySelector('.custom-reading-time');
+                        
+                        if (wordcountSpan) wordcountSpan.textContent = `📝 ${wordCount} 字`;
+                        if (readingTimeSpan) readingTimeSpan.textContent = `⏱️ 约 ${readingTime} 分钟`;
+                    }, 500);
+                }
+                
+                // 隐藏原始的文章标题
+                const originalTitles = document.querySelectorAll('#post-info, .post-title, #page-header.post-bg');
+                originalTitles.forEach(el => {
+                    if (el && el.id === 'post-info') {
+                        el.style.display = 'none';
+                    }
+                });
+            }
+        }, 200);
+    }
+    
+    // 强制显示所有图片
+    const images = document.querySelectorAll('img');
+    images.forEach(img => {
+        if (img.hasAttribute('data-src')) {
+            img.src = img.getAttribute('data-src');
+            img.removeAttribute('data-src');
+        }
+        img.style.opacity = '1';
+        img.style.visibility = 'visible';
+        img.style.display = 'block';
+    });
+    
+    // 修复PlantUML代码块识别
+    const codeBlocks = document.querySelectorAll('figure.highlight');
+    codeBlocks.forEach(block => {
+        const code = block.querySelector('code');
+        if (code && code.textContent.includes('@startuml')) {
+            block.classList.add('plantuml');
+            const caption = block.querySelector('figcaption');
+            if (caption) {
+                caption.innerHTML = '🌱 PlantUML';
+            }
+        }
+    });
+});
+
+// 添加自定义样式
+const customStyles = `
+    .custom-post-header {
+        margin: 2rem auto;
+        max-width: 900px;
+        border-radius: 16px;
+        overflow: hidden;
+        box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    }
+    
+    .custom-post-title-bg {
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        color: white;
+        padding: 3rem 2rem 2rem 2rem;
+        text-align: center;
+    }
+    
+    .custom-post-title {
+        font-size: 2.5rem;
+        font-weight: 800;
+        margin: 0 0 1.5rem 0;
+        line-height: 1.3;
+    }
+    
+    .custom-post-meta {
+        display: flex;
+        justify-content: center;
+        gap: 2rem;
+        flex-wrap: wrap;
+    }
+    
+    .custom-wordcount,
+    .custom-reading-time {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 0.5rem 1rem;
+        border-radius: 20px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        backdrop-filter: blur(10px);
+    }
+    
+    @media (max-width: 768px) {
+        .custom-post-title {
+            font-size: 2rem;
+        }
+        
+        .custom-post-meta {
+            gap: 1rem;
+        }
+        
+        .custom-post-title-bg {
+            padding: 2rem 1rem 1.5rem 1rem;
+        }
+    }
+`;
+
+// 注入样式
+const styleSheet = document.createElement('style');
+styleSheet.textContent = customStyles;
+document.head.appendChild(styleSheet); 

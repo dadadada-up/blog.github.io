@@ -1,0 +1,32 @@
+/**
+ * 统一顶部标题样式修复
+ * 这个文件用于确保所有管理页面的顶部标题样式一致
+ */
+
+/* 强制应用顶部标题样式 */
+body .admin-container .admin-header .admin-logo,
+.admin-container .admin-header .admin-logo,
+.admin-header .admin-logo,
+.admin-logo {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  background: linear-gradient(90deg, var(--accent-color), var(--success-color)) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important; /* 兼容性处理 */
+}
+
+/* 确保顶部导航栏样式一致 */
+body .admin-container .admin-header,
+.admin-container .admin-header,
+.admin-header {
+  background-color: var(--primary-color) !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 20px !important;
+  box-shadow: var(--shadow-light) !important;
+  z-index: 10 !important;
+} 

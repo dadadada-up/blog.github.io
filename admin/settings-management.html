@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统设置 - 博客管理系统</title>
+  <link rel="stylesheet" href="/admin/modern-admin.css">
+  <link rel="stylesheet" href="/admin/css/modern-layout.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/admin-menu.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <link rel="stylesheet" href="/admin/css/unified-layout.css">
+  
+  <script src="/admin/js/api-interceptor.js"></script>
+  <script src="/admin/js/common-menu.js"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- 顶部导航栏 -->
+    <header class="admin-header">
+      <div class="admin-logo">博客管理系统</div>
+      <div class="admin-header-actions">
+        <a href="/" target="_blank" class="dashboard-button">
+          <i class="fas fa-external-link-alt"></i> 查看网站
+        </a>
+        <a href="javascript:void(0);" onclick="logout()" class="logout-button">
+          <i class="fas fa-sign-out-alt"></i> 注销
+        </a>
+      </div>
+    </header>
+    
+    <!-- 侧边导航栏 - 由common-menu.js动态生成 -->
+    <aside class="admin-sidebar"></aside>
+    
+    <!-- 移动端菜单按钮 -->
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 主内容区域 -->
+    <main class="admin-main">
+      <div class="page-container">
+        <div class="page-header">
+          <div class="page-title">系统设置</div>
+        </div>
+        
+        <div class="page-content">
+          <!-- 基本设置 -->
+          <div class="settings-section">
+            <h3 class="section-title">基本设置</h3>
+            
+            <div class="form-group">
+              <label class="form-label">网站标题</label>
+              <input type="text" class="admin-form-input" id="siteTitle" placeholder="我的博客" value="我的博客">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">网站描述</label>
+              <textarea class="admin-form-input" id="siteDescription" rows="3" placeholder="我的个人博客网站">我的个人博客网站</textarea>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">网站关键词</label>
+              <input type="text" class="admin-form-input" id="siteKeywords" placeholder="博客,Hexo,个人网站" value="博客,Hexo,个人网站">
+            </div>
+          </div>
+
+          <!-- 部署设置 -->
+          <div class="settings-section">
+            <h3 class="section-title">部署设置</h3>
+            
+            <div class="form-group">
+              <label class="form-label">部署方式</label>
+              <select class="admin-form-input" id="deployType">
+                <option value="github">GitHub Pages</option>
+                <option value="netlify">Netlify</option>
+                <option value="vercel">Vercel</option>
+                <option value="custom">自定义</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">仓库地址</label>
+              <input type="text" class="admin-form-input" id="repoUrl" placeholder="https://github.com/username/blog.github.io" value="https://github.com/username/blog.github.io">
+            </div>
+          </div>
+
+          <!-- 主题设置 -->
+          <div class="settings-section">
+            <h3 class="section-title">主题设置</h3>
+            
+            <div class="form-group">
+              <label class="form-label">当前主题</label>
+              <select class="admin-form-input" id="currentTheme">
+                <option value="landscape">Landscape (默认)</option>
+                <option value="next">Next</option>
+                <option value="icarus">Icarus</option>
+                <option value="butterfly">Butterfly</option>
+                <option value="custom">自定义主题</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">主题配置</label>
+              <textarea class="admin-form-input" id="themeConfig" rows="6" placeholder="# 主题配置文件内容"># 主题配置文件内容
+menu:
+  首页: /
+  归档: /archives
+  关于: /about</textarea>
+            </div>
+          </div>
+
+          <!-- 评论设置 -->
+          <div class="settings-section">
+            <h3 class="section-title">评论设置</h3>
+            
+            <div class="form-group">
+              <label class="form-label">评论系统</label>
+              <select class="admin-form-input" id="commentSystem">
+                <option value="none">禁用评论</option>
+                <option value="disqus">Disqus</option>
+                <option value="gitalk">Gitalk</option>
+                <option value="valine">Valine</option>
+                <option value="waline">Waline</option>
+              </select>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">评论配置</label>
+              <textarea class="admin-form-input" id="commentConfig" rows="4" placeholder="评论系统配置参数"># 评论系统配置参数
+# 根据选择的评论系统填写相应配置</textarea>
+            </div>
+          </div>
+
+          <!-- 搜索设置 -->
+          <div class="settings-section">
+            <h3 class="section-title">搜索设置</h3>
+            
+            <div class="form-group">
+              <label class="form-label">启用搜索</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="enableSearch" checked>
+                  <span class="checkmark"></span>
+                  启用站内搜索功能
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">搜索引擎</label>
+              <select class="admin-form-input" id="searchEngine">
+                <option value="local">本地搜索</option>
+                <option value="algolia">Algolia</option>
+                <option value="swiftype">Swiftype</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- SEO设置 -->
+          <div class="settings-section">
+            <h3 class="section-title">SEO设置</h3>
+            
+            <div class="form-group">
+              <label class="form-label">网站地图</label>
+              <div class="checkbox-group">
+                <label class="checkbox-label">
+                  <input type="checkbox" id="enableSitemap" checked>
+                  <span class="checkmark"></span>
+                  自动生成网站地图
+                </label>
+              </div>
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">Google Analytics ID</label>
+              <input type="text" class="admin-form-input" id="googleAnalytics" placeholder="GA-XXXXXXXXX-X">
+            </div>
+            
+            <div class="form-group">
+              <label class="form-label">百度统计ID</label>
+              <input type="text" class="admin-form-input" id="baiduAnalytics" placeholder="xxxxxxxxxxxxxxxxx">
+            </div>
+          </div>
+
+          <!-- 底部保存按钮 -->
+          <div class="settings-footer">
+            <button class="admin-btn admin-btn-primary" onclick="saveSettings()">
+              <i class="fas fa-save"></i> 保存设置
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <style>
+    /* 页面特定样式 */
+    .page-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .settings-section {
+      background: white;
+      border-radius: 8px;
+      padding: 25px;
+      margin-bottom: 20px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .section-title {
+      font-size: 18px;
+      font-weight: 600;
+      color: #303133;
+      margin: 0 0 20px 0;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #409EFF;
+    }
+
+    .form-group {
+      margin-bottom: 15px;
+    }
+
+    .settings-footer {
+      text-align: center;
+      padding: 30px 0;
+      margin-top: 20px;
+      border-top: 1px solid #ebeef5;
+    }
+
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+      color: #303133;
+      font-size: 14px;
+    }
+
+    .admin-form-input {
+      width: 100%;
+      padding: 10px 12px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.3s ease;
+      box-sizing: border-box;
+    }
+
+    .admin-form-input:focus {
+      outline: none;
+      border-color: #409EFF;
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.1);
+    }
+
+    .admin-form-input[readonly] {
+      background-color: #f5f7fa;
+      color: #909399;
+    }
+
+    textarea.admin-form-input {
+      resize: vertical;
+      min-height: 80px;
+      font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+      line-height: 1.5;
+    }
+
+    .checkbox-group {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+      font-size: 14px;
+      color: #606266;
+    }
+
+    .checkbox-label input[type="checkbox"] {
+      margin-right: 8px;
+      width: 16px;
+      height: 16px;
+    }
+
+    .form-help {
+      margin-top: 5px;
+      font-size: 12px;
+      color: #909399;
+      line-height: 1.4;
+    }
+
+    .settings-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 20px;
+    }
+
+    @media (max-width: 768px) {
+      .settings-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .settings-section {
+        padding: 20px;
+      }
+    }
+
+    /* 保存按钮特殊样式 */
+    .admin-btn-primary {
+      background: linear-gradient(135deg, #409EFF 0%, #337ecc 100%);
+      border: none;
+      color: white;
+      padding: 10px 20px;
+      border-radius: 6px;
+      font-weight: 500;
+      box-shadow: 0 2px 4px rgba(64, 158, 255, 0.3);
+      transition: all 0.3s ease;
+    }
+
+    .admin-btn-primary:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 4px 8px rgba(64, 158, 255, 0.4);
+    }
+
+    /* 成功提示样式 */
+    .success-toast {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: #67C23A;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 6px;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+      z-index: 1000;
+      animation: slideInRight 0.3s ease;
+    }
+
+    @keyframes slideInRight {
+      from {
+        transform: translateX(100%);
+        opacity: 0;
+      }
+      to {
+        transform: translateX(0);
+        opacity: 1;
+      }
+    }
+  </style>
+
+  <script>
+    // 页面初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查登录状态
+      if (localStorage.getItem('adminLoggedIn') !== 'true') {
+        window.location.href = '/admin/login.html';
+        return;
+      }
+
+      // 加载设置数据
+      loadSettings();
+    });
+
+    // 加载设置数据
+    async function loadSettings() {
+      try {
+        // 这里应该从实际的配置文件或API加载设置
+        // 现在使用模拟数据
+        const settings = {
+          siteTitle: '我的博客',
+          siteDescription: '我的个人博客网站',
+          siteKeywords: '博客,Hexo,个人网站',
+          deployType: 'github',
+          repoUrl: 'https://github.com/username/blog.github.io',
+          currentTheme: 'landscape',
+          themeConfig: '# 主题配置文件内容\nmenu:\n  首页: /\n  归档: /archives\n  关于: /about',
+          commentSystem: 'none',
+          commentConfig: '# 评论系统配置参数\n# 根据选择的评论系统填写相应配置',
+          enableSearch: true,
+          searchEngine: 'local',
+          enableSitemap: true,
+          googleAnalytics: '',
+          baiduAnalytics: ''
+        };
+
+        // 填充表单
+        populateForm(settings);
+        
+      } catch (error) {
+        console.error('加载设置失败:', error);
+        showToast('加载设置失败，请刷新页面重试', 'error');
+      }
+    }
+
+    // 填充表单数据
+    function populateForm(settings) {
+      Object.keys(settings).forEach(key => {
+        const element = document.getElementById(key);
+        if (element) {
+          if (element.type === 'checkbox') {
+            element.checked = settings[key];
+          } else {
+            element.value = settings[key];
+          }
+        }
+      });
+    }
+
+    // 保存设置
+    async function saveSettings() {
+      try {
+        // 收集表单数据
+        const settings = {
+          siteTitle: document.getElementById('siteTitle').value,
+          siteDescription: document.getElementById('siteDescription').value,
+          siteKeywords: document.getElementById('siteKeywords').value,
+          deployType: document.getElementById('deployType').value,
+          repoUrl: document.getElementById('repoUrl').value,
+          currentTheme: document.getElementById('currentTheme').value,
+          themeConfig: document.getElementById('themeConfig').value,
+          commentSystem: document.getElementById('commentSystem').value,
+          commentConfig: document.getElementById('commentConfig').value,
+          enableSearch: document.getElementById('enableSearch').checked,
+          searchEngine: document.getElementById('searchEngine').value,
+          enableSitemap: document.getElementById('enableSitemap').checked,
+          googleAnalytics: document.getElementById('googleAnalytics').value,
+          baiduAnalytics: document.getElementById('baiduAnalytics').value
+        };
+
+        // 这里应该发送到实际的API进行保存
+        console.log('保存设置:', settings);
+        
+        // 模拟保存延迟
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        showToast('设置已保存成功！', 'success');
+        
+      } catch (error) {
+        console.error('保存设置失败:', error);
+        showToast('保存设置失败，请重试', 'error');
+      }
+    }
+
+    // 显示提示消息
+    function showToast(message, type = 'info') {
+      // 移除已存在的toast
+      const existingToast = document.querySelector('.toast');
+      if (existingToast) {
+        existingToast.remove();
+      }
+
+      const toast = document.createElement('div');
+      toast.className = `toast ${type === 'success' ? 'success-toast' : 'error-toast'}`;
+      toast.innerHTML = `
+        <i class="fas ${type === 'success' ? 'fa-check-circle' : 'fa-exclamation-circle'}"></i>
+        ${message}
+      `;
+      
+      document.body.appendChild(toast);
+      
+      // 3秒后自动移除
+      setTimeout(() => {
+        if (toast.parentNode) {
+          toast.parentNode.removeChild(toast);
+        }
+      }, 3000);
+    }
+
+    // 登出
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = '/admin/login.html';
+    }
+  </script>
+</body>
+</html> 

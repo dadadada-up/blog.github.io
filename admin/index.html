@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>博客管理系统</title>
+  <link rel="stylesheet" href="/admin/index.css">
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+  <script>
+    // 检查是否已登录自定义管理系统
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = '/admin/dashboard.html';
+    }
+    
+    // 监听hexo-myadmin的API响应
+    const originalFetch = window.fetch;
+    window.fetch = function(url, options) {
+      return originalFetch(url, options).then(response => {
+        // 只处理登录API的响应
+        if (url && url.includes('/admin/api/login')) {
+          response.clone().json().then(data => {
+            if (data.ok && data.redirect) {
+              localStorage.setItem('adminLoggedIn', 'true');
+              window.location.href = data.redirect;
+            }
+          }).catch(() => {});
+        }
+        return response;
+      });
+    };
+  </script>
+</head>
+<body>
+  <div id="app">
+    <!-- 这里是hexo-myadmin的挂载点 -->
+    <div class="loading-container">
+      <div class="loading-spinner"></div>
+      <div class="loading-text">加载中，请稍候...</div>
+    </div>
+  </div>
+  
+  <script>
+    // 添加返回仪表盘按钮
+    document.addEventListener('DOMContentLoaded', function() {
+      setTimeout(function() {
+        if (!document.querySelector('#back-to-dashboard')) {
+          const backBtn = document.createElement('a');
+          backBtn.id = 'back-to-dashboard';
+          backBtn.href = '/admin/dashboard.html';
+          backBtn.innerHTML = '返回仪表盘';
+          backBtn.className = 'dashboard-button';
+          document.body.appendChild(backBtn);
+        }
+      }, 1000);
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>正在加载管理页面...</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #f5f7fa;
+    }
+    
+    .loading-container {
+      text-align: center;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #409EFF;
+      animation: spin 1s ease-in-out infinite;
+      margin: 0 auto 20px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    .message {
+      font-size: 16px;
+      color: #606266;
+      margin-bottom: 30px;
+    }
+    
+    .btn {
+      padding: 8px 16px;
+      background-color: #409EFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+    }
+  </style>
+  <!-- 引入阻止重定向脚本 -->
+  <script src="/admin/external/no-redirect.js"></script>
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 获取URL参数
+    function getParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+    
+    // 设置页面类型
+    const pageType = getParam('type') || 'post';
+    let targetPath = '';
+    let pageTitle = '';
+    
+    // 设置目标路径
+    switch (pageType) {
+      case 'post':
+        pageTitle = '文章管理';
+        targetPath = '/admin/index.html#/post';
+        break;
+      case 'new':
+        pageTitle = '新建文章';
+        targetPath = '/admin/index.html#/new';
+        break;
+      case 'page':
+        pageTitle = '页面管理';
+        targetPath = '/admin/index.html#/page';
+        break;
+      case 'settings':
+        pageTitle = '系统设置';
+        targetPath = '/admin/index.html#/settings';
+        break;
+      default:
+        pageTitle = '博客管理';
+        targetPath = '/admin/index.html';
+    }
+    
+    // 添加阻止重定向参数
+    targetPath += (targetPath.includes('?') ? '&' : '?') + 'noDashboardRedirect=true';
+    
+    document.addEventListener('DOMContentLoaded', function() {
+      // 更新页面标题
+      document.title = pageTitle + ' - 博客管理系统';
+      
+      // 3秒后自动跳转
+      setTimeout(function() {
+        window.location.href = targetPath;
+      }, 1500);
+    });
+    
+    // 立即跳转
+    function redirectNow() {
+      window.location.href = targetPath;
+    }
+  </script>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <div class="loading-container">
+    <div class="spinner"></div>
+    <div class="message">正在准备加载<span id="pageTypeText"></span>页面...</div>
+    <a href="javascript:void(0);" onclick="redirectNow()" class="btn">立即跳转</a>
+    <script>
+      // 设置页面类型文本
+      document.getElementById('pageTypeText').textContent = pageTitle;
+    </script>
+  </div>
+</body>
+</html> 

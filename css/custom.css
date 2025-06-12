@@ -1,0 +1,283 @@
+/* ================================================================
+   博客彻底修复样式 - 最终版本 V7
+   彻底解决所有前端布局问题
+   ================================================================ */
+
+/* ===== 1. 彻底修复顶部导航栏 ===== */
+
+/* 隐藏顶部大字和下拉箭头 */
+#site-info, #site-title, #scroll-down {
+  display: none !important;
+}
+
+#page-header #site-info,
+#page-header #site-title,
+#page-header #scroll-down {
+  display: none !important;
+}
+
+/* 顶部导航栏 - 现代简洁风格 */
+html body #page-header {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  width: 100% !important;
+  height: 75px !important;
+  z-index: 9999 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(20px) !important;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08) !important;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.05) !important;
+}
+
+html body #nav {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  height: 75px !important;
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 0 2rem !important;
+}
+
+/* 博客标题 */
+html body #blog-info {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 1.6rem !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  letter-spacing: -0.02em !important;
+}
+
+html body #blog-info .nav-site-title {
+  color: #1a1a1a !important;
+  text-decoration: none !important;
+  transition: color 0.2s ease !important;
+}
+
+html body #blog-info .nav-site-title:hover {
+  color: #3b82f6 !important;
+}
+
+/* 菜单样式 */
+html body #menus .menus_items {
+  display: flex !important;
+  gap: 1rem !important;
+}
+
+html body #menus .menus_item > a {
+  display: flex !important;
+  align-items: center !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+  font-size: 0.95rem !important;
+  font-weight: 500 !important;
+  color: #4a5568 !important;
+  background: #f8fafc !important;
+  border-radius: 8px !important;
+  padding: 0.6rem 1.2rem !important;
+  transition: all 0.2s ease !important;
+  border: 1px solid transparent !important;
+  text-decoration: none !important;
+}
+
+html body #menus .menus_item > a:hover {
+  color: #3b82f6 !important;
+  background: #eff6ff !important;
+  border-color: #3b82f6 !important;
+  transform: translateY(-1px) !important;
+}
+
+html body #menus .menus_item > a i {
+  font-size: 1em !important;
+  margin-right: 0.4rem !important;
+}
+
+/* ===== 2. 修复页面布局和边栏 ===== */
+
+/* 为固定导航栏预留空间 */
+html body {
+  padding-top: 75px !important;
+}
+
+/* 主容器布局 */
+html body #content-inner {
+  max-width: 1400px !important;
+  margin: 0 auto !important;
+  padding: 2rem !important;
+  display: flex !important;
+  gap: 2rem !important;
+}
+
+/* 主内容区域 */
+html body #recent-posts,
+html body #page {
+  flex: 1 !important;
+  min-width: 0 !important;
+  max-width: calc(100% - 350px) !important;
+}
+
+/* 边栏固定定位 */
+html body #aside {
+  position: fixed !important;
+  top: 95px !important;
+  right: 2rem !important;
+  width: 320px !important;
+  height: calc(100vh - 115px) !important;
+  overflow-y: auto !important;
+  z-index: 100 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  backdrop-filter: blur(10px) !important;
+  border-radius: 12px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  padding: 1.5rem !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+/* 文章卡片样式 */
+html body .recent-post-item {
+  background: #fff !important;
+  border-radius: 12px !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  margin-bottom: 1.5rem !important;
+  overflow: hidden !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  transition: box-shadow 0.2s ease !important;
+}
+
+html body .recent-post-item:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1) !important;
+  transform: none !important;
+}
+
+/* ===== 3. Categories页面专用样式 ===== */
+
+/* 隐藏原始分类列表，为JavaScript重建做准备 */
+html body .type-categories .category-lists {
+  display: none !important;
+}
+
+/* Categories页面容器 */
+html body .simple-categories-container {
+  max-width: 100% !important;
+  margin: 0 !important;
+  padding: 2rem !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-radius: 16px !important;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(0, 0, 0, 0.06) !important;
+}
+
+html body .simple-categories-title {
+  text-align: center !important;
+  font-size: 2rem !important;
+  font-weight: 700 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 2.5rem !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+html body .simple-categories-grid {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)) !important;
+  gap: 1.5rem !important;
+  max-width: 900px !important;
+  margin: 0 auto !important;
+}
+
+html body .category-card {
+  background: #fff !important;
+  border-radius: 12px !important;
+  padding: 1.5rem !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+  border: 1px solid rgba(0, 0, 0, 0.05) !important;
+  border-left: 4px solid #3b82f6 !important;
+  transition: all 0.2s ease !important;
+  cursor: pointer !important;
+}
+
+html body .category-card:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12) !important;
+}
+
+html body .category-card:nth-child(1) { border-left-color: #3b82f6 !important; }
+html body .category-card:nth-child(2) { border-left-color: #10b981 !important; }
+html body .category-card:nth-child(3) { border-left-color: #f59e0b !important; }
+html body .category-card:nth-child(4) { border-left-color: #8b5cf6 !important; }
+html body .category-card:nth-child(5) { border-left-color: #ef4444 !important; }
+html body .category-card:nth-child(6) { border-left-color: #06b6d4 !important; }
+html body .category-card:nth-child(7) { border-left-color: #84cc16 !important; }
+
+html body .category-title {
+  font-size: 1.2rem !important;
+  font-weight: 600 !important;
+  color: #1a1a1a !important;
+  margin-bottom: 0.5rem !important;
+}
+
+html body .category-count {
+  font-size: 0.9rem !important;
+  color: #6b7280 !important;
+  margin-bottom: 1rem !important;
+}
+
+html body .category-arrow {
+  color: #3b82f6 !important;
+  font-weight: 500 !important;
+  font-size: 0.9rem !important;
+}
+
+/* ===== 4. 移动端响应式 ===== */
+@media (max-width: 1200px) {
+  html body #aside {
+    position: relative !important;
+    width: 100% !important;
+    height: auto !important;
+    top: auto !important;
+    right: auto !important;
+    margin-top: 2rem !important;
+  }
+  
+  html body #content-inner {
+    flex-direction: column !important;
+  }
+  
+  html body #recent-posts,
+  html body #page {
+    max-width: 100% !important;
+  }
+}
+
+@media (max-width: 768px) {
+  html body #page-header {
+    height: 65px !important;
+  }
+  
+  html body {
+    padding-top: 65px !important;
+  }
+  
+  html body #nav {
+    height: 65px !important;
+    padding: 0 1rem !important;
+  }
+  
+  html body #blog-info {
+    font-size: 1.3rem !important;
+  }
+  
+  html body #menus .menus_items {
+    gap: 0.5rem !important;
+  }
+  
+  html body #menus .menus_item > a {
+    font-size: 0.85rem !important;
+    padding: 0.5rem 0.8rem !important;
+  }
+  
+  html body #content-inner {
+    padding: 1rem !important;
+  }
+} 

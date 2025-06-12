@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理页面跳转器 - 博客管理系统</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #f5f7fa;
+    }
+    .loading {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #409EFF;
+      animation: spin 1s linear infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    .error-message {
+      max-width: 500px;
+      margin: 20px auto;
+      padding: 20px;
+      background-color: #fff;
+      border-radius: 8px;
+      box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+      text-align: center;
+    }
+    .error-message h2 {
+      color: #f56c6c;
+      margin-top: 0;
+    }
+    .error-message p {
+      margin-bottom: 20px;
+    }
+    .button-container {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    .button {
+      padding: 8px 16px;
+      background: #409EFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .button.secondary {
+      background: #67c23a;
+    }
+  </style>
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 解析URL参数
+    function getQueryParam(param) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(param);
+    }
+    
+    // 页面加载完成后执行
+    window.onload = function() {
+      // 获取要跳转的页面类型
+      const pageType = getQueryParam('type');
+      
+      if (!pageType) {
+        showError('未指定页面类型', '请指定要跳转的页面类型参数 (type=post|new|page|settings)');
+        return;
+      }
+      
+      // 根据类型确定跳转URL
+      let targetUrl;
+      switch (pageType) {
+        case 'post':
+          targetUrl = '/admin/#/post';
+          break;
+        case 'new':
+          targetUrl = '/admin/#/new';
+          break;
+        case 'page':
+          targetUrl = '/admin/#/page';
+          break;
+        case 'settings':
+          targetUrl = '/admin/#/settings';
+          break;
+        default:
+          showError('无效的页面类型', `不支持的页面类型: ${pageType}`);
+          return;
+      }
+      
+      // 设置跳转标志，防止重定向循环
+      sessionStorage.setItem('directAccess', pageType);
+      
+      // 创建一个新的窗口或标签页，打开目标URL
+      const targetWindow = window.open(targetUrl, '_self');
+      
+      // 如果5秒内未跳转，显示错误
+      setTimeout(function() {
+        if (document.querySelector('.loading')) {
+          showError('跳转超时', '跳转到管理页面超时，请尝试直接访问或返回仪表盘。');
+        }
+      }, 5000);
+    };
+    
+    // 显示错误信息
+    function showError(title, message) {
+      const loadingEl = document.querySelector('.loading');
+      if (loadingEl) {
+        loadingEl.innerHTML = `
+          <div class="error-message">
+            <h2>${title}</h2>
+            <p>${message}</p>
+            <div class="button-container">
+              <a href="/admin/dashboard.html" class="button">返回仪表盘</a>
+              <a href="javascript:location.reload()" class="button secondary">重试</a>
+            </div>
+          </div>
+        `;
+      }
+    }
+  </script>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <div class="loading">
+    <div class="spinner"></div>
+    <div>正在跳转到管理页面...</div>
+  </div>
+</body>
+</html> 

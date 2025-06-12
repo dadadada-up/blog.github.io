@@ -1,0 +1,229 @@
+/* Hexo Admin Dashboard 样式 */
+.dashboard-container {
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 5px;
+  margin-bottom: 20px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.dashboard-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.dashboard-title {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.dashboard-actions {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.dashboard-refresh {
+  background: #4CAF50;
+  color: white;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+.dashboard-btn {
+  padding: 8px 15px;
+  border-radius: 4px;
+  text-decoration: none;
+  color: white;
+  font-size: 14px;
+}
+
+.dashboard-btn-notion {
+  background-color: #2196F3;
+}
+
+.dashboard-btn:hover {
+  opacity: 0.9;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.stat-card {
+  background: white;
+  padding: 15px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  text-align: center;
+}
+
+.stat-value {
+  font-size: 28px;
+  font-weight: bold;
+  color: #2196F3;
+  margin: 10px 0;
+}
+
+.stat-label {
+  color: #666;
+  font-size: 14px;
+}
+
+.post-status {
+  background: white;
+  padding: 15px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  margin-bottom: 20px;
+}
+
+.post-status h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.status-bar {
+  height: 24px;
+  background: #f0f0f0;
+  border-radius: 12px;
+  overflow: hidden;
+  margin: 15px 0;
+  position: relative;
+}
+
+.status-published {
+  height: 100%;
+  background: #4CAF50;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.status-draft {
+  height: 100%;
+  background: #FF9800;
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.status-legend {
+  display: flex;
+  justify-content: space-around;
+  margin-top: 10px;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+}
+
+.legend-color {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
+
+.legend-published {
+  background: #4CAF50;
+}
+
+.legend-draft {
+  background: #FF9800;
+}
+
+.recent-posts {
+  background: white;
+  padding: 15px;
+  border-radius: 4px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.recent-posts h3 {
+  margin-top: 0;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 10px;
+}
+
+.post-list {
+  list-style: none;
+  padding: 0;
+}
+
+.post-item {
+  padding: 10px 0;
+  border-bottom: 1px solid #f0f0f0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.post-item:last-child {
+  border-bottom: none;
+}
+
+.post-item-content {
+  flex: 1;
+}
+
+.post-title {
+  font-weight: bold;
+  color: #333;
+  text-decoration: none;
+  display: block;
+}
+
+.post-date {
+  font-size: 12px;
+  color: #999;
+}
+
+.post-status-badge {
+  padding: 3px 8px;
+  border-radius: 3px;
+  font-size: 12px;
+  font-weight: bold;
+  color: white;
+}
+
+.status-published-badge {
+  background: #4CAF50;
+}
+
+.status-draft-badge {
+  background: #FF9800;
+}
+
+/* 修复原管理界面的留白问题 */
+body.admin-body {
+  padding-top: 0 !important;
+  margin-top: 0 !important;
+}
+
+.admin-header {
+  margin-top: 0 !important;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 480px) {
+  .stats-grid {
+    grid-template-columns: 1fr;
+  }
+}

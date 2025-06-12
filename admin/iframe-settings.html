@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>系统设置 - 博客管理系统</title>
+  <link rel="stylesheet" href="/admin/modern-admin.css">
+  
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background-color: #f5f7fa;
+    }
+    .iframe-container {
+      width: 100%;
+      height: 100%;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+    }
+    .back-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #409EFF;
+      color: white;
+      padding: 8px 15px;
+      border-radius: 4px;
+      text-decoration: none;
+      font-size: 14px;
+      z-index: 9999;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    }
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      background-color: #f5f7fa;
+      z-index: 1;
+    }
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #409EFF;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 20px;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 用于记录重定向尝试次数
+    let redirectAttempts = 0;
+    const MAX_REDIRECT_ATTEMPTS = 3;
+  </script>
+</head>
+<body>
+  <a href="/admin/dashboard.html" class="back-btn">返回仪表盘</a>
+  
+  <div class="iframe-container">
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <div>正在加载系统设置...</div>
+    </div>
+  </div>
+  
+  <script>
+    // 延迟加载iframe，避免立即重定向
+    setTimeout(function() {
+      const container = document.querySelector('.iframe-container');
+      const iframe = document.createElement('iframe');
+      iframe.id = 'adminFrame';
+      // 使用时间戳参数避免缓存
+      iframe.src = '/admin/#/settings?t=' + new Date().getTime();
+      
+      iframe.onload = function() {
+        try {
+          // 尝试访问iframe内容
+          const frameContent = this.contentWindow;
+          
+          // 隐藏加载指示器
+          document.getElementById('loadingIndicator').style.display = 'none';
+          
+          // 检查是否被重定向到了其他页面
+          if (frameContent.location.pathname.includes('/dashboard.html')) {
+            // 增加重定向计数
+            redirectAttempts++;
+            
+            // 如果超过最大尝试次数，停止尝试
+            if (redirectAttempts >= MAX_REDIRECT_ATTEMPTS) {
+              console.log('达到最大重定向尝试次数，停止尝试');
+              // 显示错误消息
+              const loading = document.getElementById('loadingIndicator');
+              loading.innerHTML = `
+                <div style="text-align: center; padding: 20px;">
+                  <h3 style="color: #f56c6c;">加载失败</h3>
+                  <p>无法加载系统设置页面，请尝试刷新页面或返回仪表盘。</p>
+                  <button onclick="window.location.reload()" style="margin-top: 10px; padding: 8px 16px; background: #409EFF; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                    重新加载
+                  </button>
+                </div>
+              `;
+              loading.style.display = 'flex';
+              return;
+            }
+            
+            // 如果被重定向到了仪表盘，使用新的参数再次加载
+            console.log(`检测到重定向，尝试重新加载 (${redirectAttempts}/${MAX_REDIRECT_ATTEMPTS})`);
+            // 使用随机参数避免缓存
+            this.src = '/admin/#/settings?nocache=' + Math.random();
+          }
+        } catch(e) {
+          // 隐藏加载指示器，即使出现跨域错误
+          document.getElementById('loadingIndicator').style.display = 'none';
+          console.log('无法检查iframe内容，可能由于跨域限制');
+        }
+      };
+      
+      container.appendChild(iframe);
+    }, 500);
+  </script>
+</body>
+</html> 

@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Notion导入 - Hexo管理面板</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.2.1/css/all.min.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+  <style>
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background-color: #f8f9fa;
+      color: #333;
+    }
+    .container {
+      max-width: 900px;
+      margin: 30px auto;
+      background-color: #fff;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      padding: 30px;
+    }
+    h1 {
+      color: #3742fa;
+      margin-bottom: 20px;
+      font-weight: 600;
+    }
+    .card {
+      margin-bottom: 20px;
+      border: none;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+    }
+    .card-header {
+      background-color: #f1f2f6;
+      border-bottom: none;
+      font-weight: 600;
+      padding: 15px 20px;
+    }
+    .card-body {
+      padding: 20px;
+    }
+    .btn-primary {
+      background-color: #3742fa;
+      border-color: #3742fa;
+    }
+    .btn-primary:hover {
+      background-color: #2f37c7;
+      border-color: #2f37c7;
+    }
+    .form-control {
+      padding: 12px;
+      border-radius: 4px;
+      margin-bottom: 15px;
+    }
+    .form-check {
+      margin-bottom: 10px;
+    }
+    .progress {
+      height: 20px;
+      margin-top: 20px;
+      margin-bottom: 10px;
+    }
+    .import-options {
+      margin-top: 20px;
+    }
+    #importStatus {
+      margin-top: 10px;
+      font-weight: 500;
+    }
+    .alert {
+      margin-top: 20px;
+    }
+    .back-link {
+      display: inline-block;
+      margin-bottom: 20px;
+      color: #3742fa;
+      text-decoration: none;
+    }
+    .back-link:hover {
+      text-decoration: underline;
+    }
+    #importLogContainer {
+      margin-top: 20px;
+      padding: 10px;
+      background-color: #f8f8f8;
+      border-radius: 4px;
+      max-height: 200px;
+      overflow-y: auto;
+      font-size: 12px;
+      font-family: monospace;
+      white-space: pre-wrap;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <a href="/admin/hexo-style-manager.html" class="back-link"><i class="fas fa-arrow-left"></i> 返回管理界面</a>
+    
+    <h1><i class="fa-solid fa-arrow-right-to-bracket"></i> Notion导入</h1>
+    
+    <div id="notionConfigForm">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa-solid fa-gear"></i> Notion配置
+        </div>
+        <div class="card-body">
+          <div class="alert alert-info">
+            <i class="fa-solid fa-info-circle"></i> 请提供Notion API凭据来导入文章。
+          </div>
+          
+          <div class="mb-3">
+            <label for="apiToken" class="form-label">Notion API密钥</label>
+            <input type="text" class="form-control" id="apiToken" placeholder="例如: ntn_xxxxxx...">
+            <div class="form-text">在 <a href="https://www.notion.so/my-integrations" target="_blank">Notion集成页面</a> 创建并获取API密钥</div>
+          </div>
+          
+          <div class="mb-3">
+            <label for="databaseId" class="form-label">数据库ID</label>
+            <input type="text" class="form-control" id="databaseId" placeholder="例如: 1c1ed4b7aaea81ed9e46fd7f0ee61cd5">
+            <div class="form-text">从Notion数据库URL中提取ID，格式为32位字符</div>
+          </div>
+          
+          <div class="import-options">
+            <h5>导入选项</h5>
+            
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="importImages" checked>
+              <label class="form-check-label" for="importImages">
+                导入图片到本地
+              </label>
+            </div>
+            
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="keepOriginalTime" checked>
+              <label class="form-check-label" for="keepOriginalTime">
+                保留原始发布时间
+              </label>
+            </div>
+            
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" value="" id="importAsDraft">
+              <label class="form-check-label" for="importAsDraft">
+                导入为草稿
+              </label>
+            </div>
+          </div>
+          
+          <button id="importButton" class="btn btn-primary mt-3">
+            <i class="fa-solid fa-download"></i> 开始导入
+          </button>
+        </div>
+      </div>
+    </div>
+    
+    <div id="importProgress" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa-solid fa-spinner fa-spin"></i> 导入进度
+        </div>
+        <div class="card-body">
+          <div class="progress">
+            <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated" role="progressbar" aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" style="width: 0%"></div>
+          </div>
+          <div id="importStatus">准备导入...</div>
+          <div id="importLogContainer"></div>
+          
+          <div class="mt-3">
+            <button id="cancelButton" class="btn btn-outline-secondary">
+              <i class="fa-solid fa-times"></i> 取消
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div id="importResult" style="display: none;">
+      <div class="card">
+        <div class="card-header">
+          <i class="fa-solid fa-check-circle"></i> 导入结果
+        </div>
+        <div class="card-body">
+          <div id="resultMessage" class="alert alert-success">
+            导入完成！
+          </div>
+          
+          <div id="importStats">
+            <p>已导入文章数: <span id="importedCount">0</span></p>
+            <p>导入失败数: <span id="failedCount">0</span></p>
+          </div>
+          
+          <div class="mt-3">
+            <a href="/admin/hexo-style-manager.html" class="btn btn-primary">
+              <i class="fa-solid fa-list"></i> 查看文章列表
+            </a>
+            <button id="importAgainButton" class="btn btn-outline-secondary">
+              <i class="fa-solid fa-redo"></i> 再次导入
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    // 等待页面加载完成
+    document.addEventListener('DOMContentLoaded', function() {
+      // 获取DOM元素
+      const notionConfigForm = document.getElementById('notionConfigForm');
+      const importProgress = document.getElementById('importProgress');
+      const importResult = document.getElementById('importResult');
+      const importButton = document.getElementById('importButton');
+      const cancelButton = document.getElementById('cancelButton');
+      const importAgainButton = document.getElementById('importAgainButton');
+      const progressBar = document.getElementById('progressBar');
+      const importStatus = document.getElementById('importStatus');
+      const importLogContainer = document.getElementById('importLogContainer');
+      const resultMessage = document.getElementById('resultMessage');
+      const importedCount = document.getElementById('importedCount');
+      const failedCount = document.getElementById('failedCount');
+      
+      // 检查是否已有配置
+      function loadSavedConfig() {
+        const savedConfig = localStorage.getItem('notionConfig');
+        
+        if (savedConfig) {
+          try {
+            const config = JSON.parse(savedConfig);
+            document.getElementById('apiToken').value = config.apiToken || '';
+            document.getElementById('databaseId').value = config.databaseId || '';
+            document.getElementById('importImages').checked = config.importImages !== false;
+            document.getElementById('keepOriginalTime').checked = config.keepOriginalTime !== false;
+            document.getElementById('importAsDraft').checked = config.importAsDraft === true;
+          } catch (e) {
+            console.error('加载保存的配置失败:', e);
+          }
+        }
+      }
+      
+      // 保存配置
+      function saveConfig() {
+        const config = {
+          apiToken: document.getElementById('apiToken').value,
+          databaseId: document.getElementById('databaseId').value,
+          importImages: document.getElementById('importImages').checked,
+          keepOriginalTime: document.getElementById('keepOriginalTime').checked,
+          importAsDraft: document.getElementById('importAsDraft').checked
+        };
+        
+        localStorage.setItem('notionConfig', JSON.stringify(config));
+      }
+      
+      // 添加日志
+      function addLog(message, type = 'info') {
+        const now = new Date();
+        const timeStr = now.toLocaleTimeString();
+        const logClasses = {
+          info: 'color: #3742fa',
+          success: 'color: #20bf6b',
+          error: 'color: #eb3b5a',
+          warning: 'color: #f7b731'
+        };
+        
+        const logStyle = logClasses[type] || logClasses.info;
+        const logEntry = `[${timeStr}] <span style="${logStyle}">${message}</span>\n`;
+        
+        importLogContainer.innerHTML += logEntry;
+        importLogContainer.scrollTop = importLogContainer.scrollHeight;
+      }
+      
+      // 处理导入
+      function processImport() {
+        // 显示进度界面
+        notionConfigForm.style.display = 'none';
+        importProgress.style.display = 'block';
+        importResult.style.display = 'none';
+        
+        // 清空日志
+        importLogContainer.innerHTML = '';
+        
+        // 获取配置
+        const apiToken = document.getElementById('apiToken').value;
+        const databaseId = document.getElementById('databaseId').value;
+        const importImages = document.getElementById('importImages').checked;
+        const keepOriginalTime = document.getElementById('keepOriginalTime').checked;
+        const importAsDraft = document.getElementById('importAsDraft').checked;
+        
+        // 验证输入
+        if (!apiToken || !databaseId) {
+          addLog('错误: API密钥和数据库ID不能为空', 'error');
+          importStatus.textContent = '导入失败: 请提供所有必要的信息';
+          progressBar.style.width = '0%';
+          progressBar.classList.remove('bg-success');
+          progressBar.classList.add('bg-danger');
+          
+          setTimeout(() => {
+            notionConfigForm.style.display = 'block';
+            importProgress.style.display = 'none';
+          }, 3000);
+          
+          return;
+        }
+        
+        // 保存配置
+        saveConfig();
+        
+        // 开始导入
+        addLog('开始从Notion导入文章...');
+        addLog(`数据库ID: ${databaseId}`);
+        addLog(`导入选项: ${importImages ? '包含图片, ' : ''}${keepOriginalTime ? '保留原始时间, ' : ''}${importAsDraft ? '导入为草稿' : '发布状态'}`);
+        
+        // 设置初始进度
+        progressBar.style.width = '10%';
+        progressBar.setAttribute('aria-valuenow', 10);
+        importStatus.textContent = '正在连接到Notion API...';
+        
+        // 准备请求数据
+        const requestData = {
+          apiToken,
+          databaseId,
+          importImages,
+          keepOriginalTime,
+          importAsDraft
+        };
+        
+        // 发送导入请求
+        fetch('/api/notion-import', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(requestData)
+        })
+        .then(response => {
+          if (!response.ok) {
+            throw new Error(`HTTP错误: ${response.status}`);
+          }
+          return response.json();
+        })
+        .then(data => {
+          // 处理响应
+          if (data.success) {
+            // 更新进度
+            progressBar.style.width = '100%';
+            progressBar.setAttribute('aria-valuenow', 100);
+            progressBar.classList.add('bg-success');
+            importStatus.textContent = '导入完成！';
+            
+            // 添加日志
+            addLog(`导入完成！成功导入 ${data.imported} 篇文章`, 'success');
+            if (data.failed > 0) {
+              addLog(`${data.failed} 篇文章导入失败`, 'warning');
+            }
+            
+            // 显示结果
+            setTimeout(() => {
+              importProgress.style.display = 'none';
+              importResult.style.display = 'block';
+              
+              resultMessage.textContent = `导入完成！成功导入 ${data.imported} 篇文章`;
+              importedCount.textContent = data.imported;
+              failedCount.textContent = data.failed;
+              
+              if (data.failed > 0) {
+                resultMessage.classList.remove('alert-success');
+                resultMessage.classList.add('alert-warning');
+              } else {
+                resultMessage.classList.remove('alert-warning');
+                resultMessage.classList.add('alert-success');
+              }
+            }, 1000);
+          } else {
+            throw new Error(data.error || '导入失败');
+          }
+        })
+        .catch(error => {
+          // 处理错误
+          console.error('导入错误:', error);
+          addLog(`导入失败: ${error.message}`, 'error');
+          
+          // 更新UI
+          progressBar.style.width = '100%';
+          progressBar.setAttribute('aria-valuenow', 100);
+          progressBar.classList.remove('bg-success');
+          progressBar.classList.add('bg-danger');
+          importStatus.textContent = `导入失败: ${error.message}`;
+          
+          // 显示结果
+          setTimeout(() => {
+            importProgress.style.display = 'none';
+            importResult.style.display = 'block';
+            
+            resultMessage.textContent = `导入失败: ${error.message}`;
+            resultMessage.classList.remove('alert-success');
+            resultMessage.classList.add('alert-danger');
+            importedCount.textContent = '0';
+            failedCount.textContent = '0';
+          }, 1000);
+        });
+      }
+      
+      // 绑定事件处理器
+      importButton.addEventListener('click', processImport);
+      
+      cancelButton.addEventListener('click', function() {
+        importProgress.style.display = 'none';
+        notionConfigForm.style.display = 'block';
+      });
+      
+      importAgainButton.addEventListener('click', function() {
+        importResult.style.display = 'none';
+        notionConfigForm.style.display = 'block';
+        
+        // 重置进度条
+        progressBar.style.width = '0%';
+        progressBar.setAttribute('aria-valuenow', 0);
+        progressBar.classList.remove('bg-success', 'bg-danger');
+      });
+      
+      // 加载保存的配置
+      loadSavedConfig();
+    });
+  </script>
+</body>
+</html> 

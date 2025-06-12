@@ -1,0 +1,82 @@
+/**
+ * 管理后台布局和背景统一样式
+ * 解决导航栏与主内容区域间隙和布局问题
+ */
+
+/* 全局重置和背景色 */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+/* 容器布局 */
+.admin-container, 
+.admin-main, 
+.main-content, 
+.dashboard-main-content,
+.post-list, 
+.editor-container, 
+.notion-settings-container,
+.dashboard-container,
+.iframe-container,
+.hexo-style-container,
+.admin-card,
+.tab-content,
+.tab-pane {
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* 侧边栏优化 */
+.admin-sidebar {
+  background-color: #ffffff !important;
+  box-shadow: none !important;
+  border-right: 1px solid #e6e6e6 !important;
+}
+
+/* 主内容区域优化 */
+.admin-main {
+  margin-left: 200px !important;
+  padding: 0 !important;
+  border-left: none !important;
+}
+
+/* 内容区域间距优化 */
+.notion-settings-container,
+.post-list,
+.editor-container {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+}
+
+/* 减少各种内边距 */
+.notion-settings-header {
+  padding: 8px 12px !important;
+}
+
+.tab-content {
+  padding: 10px !important;
+}
+
+.notion-card {
+  margin-bottom: 8px !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+}
+
+.notion-card-body {
+  padding: 10px 15px !important;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .admin-main {
+    margin-left: 0 !important;
+  }
+} 

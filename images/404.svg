@@ -1,0 +1,30 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 400" width="800" height="400">
+  <style>
+    .text { font-family: Arial, sans-serif; font-weight: bold; }
+    .large-text { font-size: 120px; }
+    .medium-text { font-size: 32px; }
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-20px); }
+      100% { transform: translateY(0px); }
+    }
+    .floating { animation: float 6s ease-in-out infinite; }
+  </style>
+  
+  <!-- 背景 -->
+  <rect width="100%" height="100%" fill="#f8f9fa" />
+  
+  <!-- 404文字 -->
+  <g transform="translate(400, 180)" class="floating">
+    <text x="0" y="0" class="text large-text" fill="#0366d6" text-anchor="middle">404</text>
+  </g>
+  
+  <!-- 装饰元素 -->
+  <circle cx="250" cy="100" r="20" fill="#0366d6" opacity="0.2" />
+  <circle cx="650" cy="320" r="30" fill="#0366d6" opacity="0.2" />
+  <circle cx="150" cy="280" r="15" fill="#0366d6" opacity="0.2" />
+  <circle cx="700" cy="150" r="25" fill="#0366d6" opacity="0.2" />
+  
+  <!-- 说明文字 -->
+  <text x="400" y="280" class="text medium-text" fill="#666" text-anchor="middle">页面不存在</text>
+</svg> 

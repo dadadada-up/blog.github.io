@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>页面管理 - 博客管理系统</title>
+  <link rel="stylesheet" href="/admin/css/modern-layout.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/admin-menu.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <link rel="stylesheet" href="/admin/css/unified-layout.css">
+  
+  <script src="/admin/js/api-interceptor.js"></script>
+  <script src="/admin/js/common-menu.js"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- 顶部导航栏 -->
+    <header class="admin-header">
+      <div class="admin-logo">博客管理系统</div>
+      <div class="admin-header-actions">
+        <a href="/" target="_blank" class="dashboard-button">
+          <i class="fas fa-external-link-alt"></i> 查看网站
+        </a>
+        <a href="javascript:void(0);" onclick="logout()" class="logout-button">
+          <i class="fas fa-sign-out-alt"></i> 注销
+        </a>
+      </div>
+    </header>
+    
+    <!-- 侧边导航栏 - 由common-menu.js动态生成 -->
+    <aside class="admin-sidebar"></aside>
+    
+    <!-- 移动端菜单按钮 -->
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 主内容区域 -->
+    <main class="admin-main">
+      <div class="page-container">
+        <div class="page-header">
+          <div class="page-title">页面列表</div>
+          <div class="page-actions">
+            <button class="admin-btn admin-btn-primary" onclick="createNewPage()">
+              <i class="fas fa-plus"></i> 新建页面
+            </button>
+            <button class="admin-btn admin-btn-success" onclick="refreshPages()">
+              <i class="fas fa-sync"></i> 刷新
+            </button>
+          </div>
+        </div>
+        
+        <div class="page-content">
+          <!-- 页面功能提示 -->
+          <div class="feature-notice">
+            <div class="notice-header">
+              <i class="fas fa-info-circle"></i>
+              <span>页面管理功能实现状态说明</span>
+            </div>
+            <div class="feature-details">
+              <h4>已实现功能：</h4>
+              <ul>
+                <li>✅ 页面列表显示（展示模拟数据）</li>
+                <li>✅ 基础UI界面和交互</li>
+                <li>✅ 编辑按钮跳转到页面编辑器</li>
+                <li>✅ 新建页面按钮功能</li>
+              </ul>
+              
+              <h4>待实现功能：</h4>
+              <ul>
+                <li>❌ 连接实际页面数据源API</li>
+                <li>❌ 页面创建、编辑、删除的后端处理</li>
+                <li>❌ 页面模板管理</li>
+                <li>❌ 页面预览功能</li>
+                <li>❌ 页面SEO设置</li>
+                <li>❌ 自定义字段管理</li>
+              </ul>
+              
+              <p><strong>当前状态：</strong>页面管理界面已完成，但需要配置后端API接口才能管理真实的页面数据。</p>
+            </div>
+          </div>
+
+          <!-- 页面列表 -->
+          <div class="pages-container" id="pagesContainer">
+            <div class="loading-state">
+              <div class="loading-spinner"></div>
+              正在加载页面列表...
+            </div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <style>
+    /* 页面特定样式 */
+    .page-actions {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .feature-notice {
+      background: linear-gradient(135deg, #e3f2fd 0%, #f1f8ff 100%);
+      border: 1px solid #90caf9;
+      border-radius: 8px;
+      padding: 20px;
+      margin-bottom: 25px;
+    }
+
+    .notice-header {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-weight: 600;
+      color: #1976d2;
+      margin-bottom: 10px;
+    }
+
+    .notice-header i {
+      font-size: 16px;
+    }
+
+    .feature-notice p {
+      margin: 10px 0 0 0;
+      color: #424242;
+      line-height: 1.5;
+    }
+
+    .feature-details h4 {
+      margin: 15px 0 8px 0;
+      color: #1976d2;
+      font-size: 14px;
+    }
+
+    .feature-details ul {
+      margin: 0 0 15px 0;
+      padding-left: 20px;
+    }
+
+    .feature-details li {
+      margin-bottom: 5px;
+      color: #424242;
+      font-size: 14px;
+    }
+
+    .pages-container {
+      background: white;
+      border-radius: 8px;
+      min-height: 400px;
+    }
+
+    .loading-state {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 60px 20px;
+      color: #909399;
+    }
+
+    .loading-spinner {
+      width: 32px;
+      height: 32px;
+      border: 3px solid #f3f3f3;
+      border-top: 3px solid #409EFF;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+      margin-bottom: 15px;
+    }
+
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+
+    .page-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 25px;
+      border-bottom: 1px solid #ebeef5;
+      transition: background-color 0.3s;
+    }
+
+    .page-item:hover {
+      background-color: #f8f9fa;
+    }
+
+    .page-item:last-child {
+      border-bottom: none;
+    }
+
+    .page-info {
+      flex: 1;
+    }
+
+    .page-title-text {
+      font-size: 16px;
+      font-weight: 600;
+      color: #303133;
+      margin-bottom: 5px;
+    }
+
+    .page-meta {
+      display: flex;
+      gap: 20px;
+      font-size: 14px;
+      color: #909399;
+    }
+
+    .page-actions-inline {
+      display: flex;
+      gap: 10px;
+    }
+
+    .page-action-btn {
+      padding: 6px 12px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: all 0.3s;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .page-action-btn.edit {
+      background-color: #409EFF;
+      color: white;
+    }
+
+    .page-action-btn.edit:hover {
+      background-color: #337ecc;
+    }
+
+    .page-action-btn.delete {
+      background-color: #F56C6C;
+      color: white;
+    }
+
+    .page-action-btn.delete:hover {
+      background-color: #f24c4c;
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+      color: #909399;
+    }
+
+    .empty-state i {
+      font-size: 48px;
+      margin-bottom: 20px;
+      color: #c0c4cc;
+    }
+
+    .empty-state h3 {
+      margin: 0 0 10px 0;
+      color: #606266;
+    }
+
+    .empty-state p {
+      margin: 0;
+      color: #909399;
+    }
+
+    @media (max-width: 768px) {
+      .page-item {
+        flex-direction: column;
+        gap: 15px;
+        align-items: flex-start;
+      }
+
+      .page-actions-inline {
+        align-self: flex-end;
+      }
+
+      .page-meta {
+        flex-direction: column;
+        gap: 5px;
+      }
+    }
+  </style>
+
+  <script>
+    // 页面初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      // 检查登录状态
+      if (localStorage.getItem('adminLoggedIn') !== 'true') {
+        window.location.href = '/admin/login.html';
+        return;
+      }
+
+      // 加载页面列表
+      loadPages();
+    });
+
+    // 加载页面列表
+    async function loadPages() {
+      try {
+        // 模拟获取页面数据（这里应该替换为实际的API调用）
+        const mockPages = [
+          {
+            title: '关于我',
+            path: 'about/index.html',
+            created: '2023-05-20',
+            layout: 'about'
+          },
+          {
+            title: '友情链接',
+            path: 'links/index.html',
+            created: '2023-05-21',
+            layout: 'links'
+          },
+          {
+            title: '留言板',
+            path: 'guestbook/index.html',
+            created: '2023-05-22',
+            layout: 'guestbook'
+          },
+          {
+            title: '网站地图',
+            path: 'sitemap/index.html',
+            created: '2023-05-23',
+            layout: 'sitemap'
+          },
+          {
+            title: '隐私政策',
+            path: 'privacy/index.html',
+            created: '2023-05-25',
+            layout: 'page'
+          }
+        ];
+
+        // 模拟加载延迟
+        setTimeout(() => {
+          displayPages(mockPages);
+        }, 800);
+
+      } catch (error) {
+        console.error('加载页面列表出错:', error);
+        showError('加载页面列表失败，请刷新页面重试');
+      }
+    }
+
+    // 显示页面列表
+    function displayPages(pages) {
+      const container = document.getElementById('pagesContainer');
+      
+      if (!pages || pages.length === 0) {
+        container.innerHTML = `
+          <div class="empty-state">
+            <i class="fas fa-file-alt"></i>
+            <h3>暂无页面</h3>
+            <p>还没有创建任何页面，点击"新建页面"按钮开始创建吧</p>
+          </div>
+        `;
+        return;
+      }
+
+      const pagesHtml = pages.map(page => `
+        <div class="page-item">
+          <div class="page-info">
+            <div class="page-title-text">${page.title}</div>
+            <div class="page-meta">
+              <span>路径: ${page.path}</span>
+              <span>创建日期: ${page.created}</span>
+              <span>布局: ${page.layout}</span>
+            </div>
+          </div>
+          <div class="page-actions-inline">
+            <a href="javascript:void(0)" class="page-action-btn edit" onclick="editPage('${page.path}')">
+              <i class="fas fa-edit"></i> 编辑
+            </a>
+            <button class="page-action-btn delete" onclick="deletePage('${page.path}', '${page.title}')">
+              <i class="fas fa-trash"></i> 删除
+            </button>
+          </div>
+        </div>
+      `).join('');
+
+      container.innerHTML = pagesHtml;
+    }
+
+    // 显示错误信息
+    function showError(message) {
+      const container = document.getElementById('pagesContainer');
+      container.innerHTML = `
+        <div class="loading-state" style="color: #f56c6c;">
+          <i class="fas fa-exclamation-triangle" style="font-size: 32px; margin-bottom: 15px;"></i>
+          ${message}
+        </div>
+      `;
+    }
+
+    // 页面操作函数
+    function createNewPage() {
+      alert('新建页面功能开发中...\n\n请直接在博客的source目录下创建对应的Markdown文件。');
+    }
+
+    function editPage(path) {
+      // 跳转到页面编辑器
+      window.location.href = `/admin/page-editor.html?path=${encodeURIComponent(path)}`;
+    }
+
+    function deletePage(path, title) {
+      if (confirm(`确定要删除页面"${title}"吗？此操作不可撤销。`)) {
+        alert(`删除页面功能开发中...\n页面路径: ${path}`);
+        // 这里应该调用删除API
+      }
+    }
+
+    function refreshPages() {
+      document.getElementById('pagesContainer').innerHTML = `
+        <div class="loading-state">
+          <div class="loading-spinner"></div>
+          正在刷新页面列表...
+        </div>
+      `;
+      loadPages();
+    }
+
+    // 登出
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = '/admin/login.html';
+    }
+  </script>
+</body>
+</html> 

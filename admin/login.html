@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理后台登录</title>
+  <style>
+    :root {
+      --primary-color: #409EFF;
+      --text-color: #303133;
+      --border-color: #DCDFE6;
+      --background-color: #f5f7fa;
+    }
+    
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+      background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+      margin: 0;
+      padding: 0;
+      height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .login-container {
+      width: 400px;
+      background-color: white;
+      border-radius: 12px;
+      box-shadow: 0 12px 24px rgba(0, 0, 0, 0.1);
+      padding: 40px;
+      text-align: center;
+    }
+    
+    .logo {
+      margin-bottom: 30px;
+    }
+    
+    .logo h1 {
+      font-size: 24px;
+      color: var(--text-color);
+      margin: 0;
+      background: linear-gradient(90deg, #409EFF, #67C23A);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+    
+    .login-form {
+      text-align: left;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-group label {
+      display: block;
+      margin-bottom: 8px;
+      font-size: 14px;
+      color: var(--text-color);
+      font-weight: 500;
+    }
+    
+    .form-group input {
+      width: 100%;
+      padding: 12px;
+      border: 1px solid var(--border-color);
+      border-radius: 4px;
+      font-size: 14px;
+      box-sizing: border-box;
+      transition: all 0.3s;
+    }
+    
+    .form-group input:focus {
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 2px rgba(64, 158, 255, 0.2);
+      outline: none;
+    }
+    
+    .login-btn {
+      width: 100%;
+      padding: 12px;
+      background: linear-gradient(135deg, #409EFF, #64b3f4);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 16px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+    
+    .login-btn:hover {
+      background: linear-gradient(135deg, #3a8fe8, #5ba8e5);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(64, 158, 255, 0.3);
+    }
+    
+    .back-link {
+      margin-top: 20px;
+      font-size: 14px;
+    }
+    
+    .back-link a {
+      color: var(--primary-color);
+      text-decoration: none;
+    }
+    
+    .back-link a:hover {
+      text-decoration: underline;
+    }
+    
+    .error-message {
+      color: #F56C6C;
+      font-size: 14px;
+      margin-top: 20px;
+      display: none;
+    }
+  </style>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <div class="login-container">
+    <div class="logo">
+      <h1>博客管理后台</h1>
+    </div>
+    
+    <div class="login-form">
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="username">用户名</label>
+          <input type="text" id="username" name="username" placeholder="请输入用户名" required>
+        </div>
+        
+        <div class="form-group">
+          <label for="password">密码</label>
+          <input type="password" id="password" name="password" placeholder="请输入密码" required>
+        </div>
+        
+        <button type="submit" class="login-btn">登 录</button>
+      </form>
+      
+      <div id="errorMessage" class="error-message">
+        用户名或密码错误，请重试
+      </div>
+      
+      <div class="back-link">
+        <a href="/">&larr; 返回博客首页</a>
+      </div>
+    </div>
+  </div>
+  
+  <script>
+    document.getElementById('loginForm').addEventListener('submit', function(event) {
+      event.preventDefault();
+      
+      const username = document.getElementById('username').value;
+      const password = document.getElementById('password').value;
+      
+      // 简单校验 - 实际应用中应该使用服务端验证
+      if (username === 'admin' && password === 'admin') {
+        // 登录成功，直接跳转到仪表盘页面
+        localStorage.setItem('adminLoggedIn', 'true');
+        window.location.href = '/admin/dashboard.html';
+      } else {
+        // 显示错误信息
+        document.getElementById('errorMessage').style.display = 'block';
+      }
+    });
+    
+    // 如果已登录，直接跳转到仪表盘页面
+    if (localStorage.getItem('adminLoggedIn') === 'true') {
+      window.location.href = '/admin/dashboard.html';
+    }
+  </script>
+</body>
+</html> 

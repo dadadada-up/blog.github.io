@@ -1,0 +1,217 @@
+/**
+ * 管理后台菜单样式
+ */
+
+/* 侧边栏基础样式 */
+.admin-sidebar {
+  position: fixed;
+  top: 60px;
+  left: 0;
+  bottom: 0;
+  width: 220px;
+  background-color: #262626;
+  overflow-y: auto;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  transition: transform 0.3s ease;
+}
+
+/* 菜单列表样式 */
+.admin-menu {
+  list-style: none !important;
+  margin: 0 !important;
+  padding: 20px 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* 菜单项样式 */
+.admin-menu-item {
+  margin: 0 !important;
+  padding: 0 !important;
+  position: relative;
+}
+
+.admin-menu-link {
+  display: flex !important;
+  align-items: center !important;
+  padding: 15px 25px !important;
+  color: #bdc3c7 !important;
+  text-decoration: none !important;
+  transition: all 0.3s ease !important;
+  border-left: 3px solid transparent !important;
+  font-size: 14px !important;
+  font-weight: 500 !important;
+}
+
+.admin-menu-link:hover {
+  background: rgba(52, 73, 94, 0.8) !important;
+  color: #ffffff !important;
+  border-left-color: #3498db !important;
+  transform: translateX(2px) !important;
+  text-decoration: none !important;
+}
+
+.admin-menu-item.active .admin-menu-link {
+  background: rgba(52, 152, 219, 0.2) !important;
+  color: #ffffff !important;
+  border-left-color: #3498db !important;
+  box-shadow: inset 0 0 10px rgba(52, 152, 219, 0.3) !important;
+}
+
+/* 菜单图标样式 */
+.admin-menu-icon {
+  margin-right: 12px !important;
+  width: 18px !important;
+  font-size: 16px !important;
+  color: #7f8c8d !important;
+  transition: color 0.3s ease !important;
+  text-align: center !important;
+}
+
+.admin-menu-link:hover .admin-menu-icon,
+.admin-menu-item.active .admin-menu-icon {
+  color: #3498db !important;
+}
+
+/* 菜单分隔线 */
+.admin-menu-divider {
+  height: 1px !important;
+  background: rgba(127, 140, 141, 0.3) !important;
+  margin: 15px 20px !important;
+  border: none !important;
+  padding: 0 !important;
+}
+
+/* 子菜单样式 */
+.admin-submenu {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  background-color: #1e1e1e;
+  overflow: hidden;
+  max-height: 0;
+  transition: max-height 0.3s ease;
+}
+
+.admin-menu-item.expanded .admin-submenu {
+  max-height: 500px;
+}
+
+.admin-submenu-item {
+  margin: 0;
+  padding: 0;
+}
+
+.admin-submenu-link {
+  display: block;
+  padding: 10px 20px 10px 46px;
+  color: #ccc;
+  text-decoration: none;
+  font-size: 13px;
+  transition: background-color 0.2s;
+}
+
+.admin-submenu-link:hover {
+  background-color: #2c2c2c;
+  color: #fff;
+}
+
+.admin-submenu-item.active .admin-submenu-link {
+  color: #fff;
+  background-color: #2c2c2c;
+}
+
+/* 折叠菜单按钮 */
+.admin-menu-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  cursor: pointer;
+}
+
+.admin-menu-toggle .admin-menu-icon-right {
+  transition: transform 0.3s;
+}
+
+.admin-menu-toggle.open .admin-menu-icon-right {
+  transform: rotate(90deg);
+}
+
+/* 移动端响应式样式 */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    transform: translateX(-100%) !important;
+    transition: transform 0.3s ease !important;
+  }
+  
+  .admin-sidebar.open {
+    transform: translateX(0) !important;
+  }
+  
+  .admin-main {
+    margin-left: 0;
+    width: 100%;
+  }
+  
+  .menu-toggle {
+    display: block !important;
+  }
+}
+
+/* 桌面端响应式样式 */
+@media (min-width: 769px) {
+  .menu-toggle {
+    display: none !important;
+  }
+  
+  .admin-main {
+    margin-left: 220px;
+    width: calc(100% - 220px);
+  }
+}
+
+/* Notion菜单项特殊样式 */
+.admin-menu-item[href="/admin/notion-settings.html"] {
+  color: #fff;
+}
+
+.admin-menu-item[href="/admin/notion-settings.html"] .admin-menu-icon {
+  color: #2ecc71;
+}
+
+.admin-menu-item[href="/admin/notion-settings.html"].active .admin-menu-icon {
+  color: #fff;
+}
+
+/* 移动端菜单按钮 */
+.menu-toggle {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  display: none;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  z-index: 101;
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
+}
+
+.menu-toggle:focus {
+  outline: none;
+}
+
+/* 主内容区域适应侧边栏 */
+.admin-main {
+  margin-left: 220px;
+  transition: margin-left 0.3s ease;
+  min-height: calc(100vh - 60px);
+  padding: 0;
+  background-color: #f5f5f5;
+  position: relative;
+} 

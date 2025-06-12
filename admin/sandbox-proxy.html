@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>管理页面</title>
+  <style>
+    body, html {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    }
+    
+    /* 顶部标题栏 */
+    .page-header {
+      height: 50px;
+      background-color: #409EFF;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      z-index: 100;
+    }
+    
+    .page-title {
+      font-size: 18px;
+      font-weight: bold;
+    }
+    
+    .header-actions {
+      display: flex;
+      gap: 10px;
+    }
+    
+    .header-button {
+      padding: 5px 10px;
+      background-color: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+      text-decoration: none;
+      font-size: 14px;
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .header-button:hover {
+      background-color: rgba(255, 255, 255, 0.3);
+    }
+    
+    /* 内容区域 */
+    .content-container {
+      position: relative;
+      height: calc(100vh - 50px);
+      overflow: hidden;
+    }
+    
+    #content-frame {
+      width: 100%;
+      height: 100%;
+      border: none;
+      overflow: hidden;
+    }
+    
+    /* 加载指示器 */
+    .loading {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.9);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 90;
+      transition: opacity 0.3s;
+    }
+    
+    .spinner {
+      width: 50px;
+      height: 50px;
+      border: 5px solid rgba(0, 0, 0, 0.1);
+      border-radius: 50%;
+      border-top-color: #409EFF;
+      animation: spin 1s ease-in-out infinite;
+      margin-bottom: 15px;
+    }
+    
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+    
+    /* 错误提示 */
+    .error-container {
+      display: none;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(255, 255, 255, 0.95);
+      z-index: 95;
+      justify-content: center;
+      align-items: center;
+    }
+    
+    .error-box {
+      max-width: 500px;
+      background-color: white;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      padding: 20px;
+      text-align: center;
+    }
+    
+    .error-icon {
+      font-size: 48px;
+      color: #f56c6c;
+      margin-bottom: 15px;
+    }
+    
+    .error-title {
+      font-size: 20px;
+      color: #f56c6c;
+      margin: 0 0 10px;
+    }
+    
+    .error-message {
+      margin-bottom: 20px;
+      color: #606266;
+    }
+    
+    .error-actions {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+    }
+    
+    .error-button {
+      padding: 8px 16px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.3s;
+    }
+    
+    .error-button.primary {
+      background-color: #409EFF;
+      color: white;
+    }
+    
+    .error-button.secondary {
+      background-color: #f2f6fc;
+      color: #606266;
+    }
+  </style>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <!-- 顶部标题栏 -->
+  <header class="page-header">
+    <div class="page-title" id="pageTitle">管理页面</div>
+    <div class="header-actions">
+      <a href="/admin/dashboard.html" class="header-button">返回仪表盘</a>
+      <a href="/" target="_blank" class="header-button">查看网站</a>
+    </div>
+  </header>
+  
+  <!-- 内容区域 -->
+  <div class="content-container">
+    <!-- 加载指示器 -->
+    <div class="loading" id="loadingIndicator">
+      <div class="spinner"></div>
+      <div>正在加载管理页面...</div>
+    </div>
+    
+    <!-- 错误提示 -->
+    <div class="error-container" id="errorContainer">
+      <div class="error-box">
+        <div class="error-icon">⚠️</div>
+        <h2 class="error-title" id="errorTitle">加载失败</h2>
+        <div class="error-message" id="errorMessage">无法加载管理页面，请检查网络连接或重试。</div>
+        <div class="error-actions">
+          <button onclick="window.location.reload()" class="error-button primary">刷新页面</button>
+          <a href="/admin/dashboard.html" class="error-button secondary">返回仪表盘</a>
+        </div>
+      </div>
+    </div>
+    
+    <!-- 内容iframe将在JS中动态创建 -->
+  </div>
+  
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 获取URL参数
+    function getUrlParam(name) {
+      const urlParams = new URLSearchParams(window.location.search);
+      return urlParams.get(name);
+    }
+    
+    // 获取页面类型
+    const pageType = getUrlParam('type') || 'post';
+    
+    // 设置标题
+    let pageTitle = '管理页面';
+    switch (pageType) {
+      case 'post': pageTitle = '文章管理'; break;
+      case 'new': pageTitle = '新建文章'; break;
+      case 'page': pageTitle = '页面管理'; break;
+      case 'settings': pageTitle = '系统设置'; break;
+    }
+    document.title = pageTitle + ' - 博客管理系统';
+    document.getElementById('pageTitle').textContent = pageTitle;
+    
+    // 防止重定向的方法
+    function preventRedirect() {
+      try {
+        // 保存原始方法
+        const originalOpen = window.open;
+        const originalAssign = window.location.assign;
+        const originalReplace = window.location.replace;
+        const originalPushState = history.pushState;
+        const originalReplaceState = history.replaceState;
+        
+        // 拦截window.open
+        window.open = function(url, target, features) {
+          if (url && typeof url === 'string' && url.includes('/dashboard')) {
+            console.warn('阻止window.open重定向:', url);
+            return null;
+          }
+          return originalOpen.call(this, url, target, features);
+        };
+        
+        // 拦截location.assign
+        window.location.assign = function(url) {
+          if (url && typeof url === 'string' && url.includes('/dashboard')) {
+            console.warn('阻止location.assign重定向:', url);
+            return;
+          }
+          return originalAssign.call(this, url);
+        };
+        
+        // 拦截location.replace
+        window.location.replace = function(url) {
+          if (url && typeof url === 'string' && url.includes('/dashboard')) {
+            console.warn('阻止location.replace重定向:', url);
+            return;
+          }
+          return originalReplace.call(this, url);
+        };
+        
+        // 拦截history.pushState
+        history.pushState = function() {
+          if (arguments[2] && typeof arguments[2] === 'string' && 
+              (arguments[2].includes('/dashboard') || arguments[2] === '/admin/dashboard.html')) {
+            console.warn('阻止pushState重定向:', arguments[2]);
+            return;
+          }
+          return originalPushState.apply(this, arguments);
+        };
+        
+        // 拦截history.replaceState
+        history.replaceState = function() {
+          if (arguments[2] && typeof arguments[2] === 'string' && 
+              (arguments[2].includes('/dashboard') || arguments[2] === '/admin/dashboard.html')) {
+            console.warn('阻止replaceState重定向:', arguments[2]);
+            return;
+          }
+          return originalReplaceState.apply(this, arguments);
+        };
+        
+        // 监听所有点击事件
+        document.addEventListener('click', function(e) {
+          let target = e.target;
+          
+          // 寻找祖先元素中的<a>标签
+          while (target && target.tagName !== 'A') {
+            target = target.parentElement;
+            if (!target) break;
+          }
+          
+          // 如果点击了链接
+          if (target && target.tagName === 'A') {
+            const href = target.getAttribute('href');
+            
+            // 检查是否是仪表盘链接
+            if (href && (href.includes('/dashboard') || href === '/admin/dashboard.html')) {
+              console.warn('阻止链接点击重定向:', href);
+              e.preventDefault();
+              return false;
+            }
+          }
+        }, true);
+        
+        console.log('防重定向设置完成');
+      } catch (e) {
+        console.error('设置防重定向失败:', e);
+      }
+    }
+    
+    // 设置超时
+    let loadTimeout;
+    function setupTimeout() {
+      loadTimeout = setTimeout(function() {
+        showError('加载超时', '管理页面加载时间过长，可能遇到了问题，请尝试刷新页面。');
+      }, 15000);
+    }
+    
+    // 显示错误
+    function showError(title, message) {
+      const errorContainer = document.getElementById('errorContainer');
+      const errorTitle = document.getElementById('errorTitle');
+      const errorMessage = document.getElementById('errorMessage');
+      const loadingIndicator = document.getElementById('loadingIndicator');
+      
+      if (errorTitle) errorTitle.textContent = title;
+      if (errorMessage) errorMessage.textContent = message;
+      
+      if (loadingIndicator) loadingIndicator.style.display = 'none';
+      if (errorContainer) {
+        errorContainer.style.display = 'flex';
+      }
+    }
+    
+    // 创建并加载iframe
+    function loadContentFrame() {
+      // 应用防重定向
+      preventRedirect();
+      
+      // 设置加载超时
+      setupTimeout();
+      
+      // 构建目标URL
+      let targetUrl;
+      switch (pageType) {
+        case 'post': targetUrl = '/admin/index.html#/post'; break;
+        case 'new': targetUrl = '/admin/index.html#/new'; break;
+        case 'page': targetUrl = '/admin/index.html#/page'; break;
+        case 'settings': targetUrl = '/admin/index.html#/settings'; break;
+        default: targetUrl = '/admin/index.html';
+      }
+      
+      // 创建iframe
+      const iframe = document.createElement('iframe');
+      iframe.id = 'content-frame';
+      
+      // 监听iframe加载完成
+      iframe.onload = function() {
+        // 清除超时
+        if (loadTimeout) clearTimeout(loadTimeout);
+        
+        try {
+          // 获取iframe文档
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          const iframeWin = iframe.contentWindow;
+          
+          // 尝试在iframe中注入防重定向脚本
+          try {
+            const script = iframeDoc.createElement('script');
+            script.textContent = `
+              (function() {
+                // 在iframe中设置标记
+                window.isInIframe = true;
+                
+                // 覆盖重定向行为
+                var _location = window.location;
+                
+                // 拦截window.location
+                try {
+                  Object.defineProperty(window, 'location', {
+                    get: function() { return _location; },
+                    set: function(val) {
+                      if (typeof val === 'string' && val.includes('/dashboard')) {
+                        console.warn('iframe内阻止重定向:', val);
+                        return;
+                      }
+                      _location = val;
+                    }
+                  });
+                } catch(e) { console.error('iframe内无法覆盖location:', e); }
+                
+                // 监听所有跳转尝试
+                window.addEventListener('beforeunload', function(e) {
+                  var url = window.location.href;
+                  if (url.includes('/dashboard')) {
+                    e.preventDefault();
+                    e.returnValue = '';
+                    return '';
+                  }
+                });
+              })();
+            `;
+            iframeDoc.head.appendChild(script);
+          } catch (e) {
+            console.warn('无法在iframe中注入脚本:', e);
+          }
+          
+          // 隐藏加载指示器
+          setTimeout(function() {
+            const loadingIndicator = document.getElementById('loadingIndicator');
+            if (loadingIndicator) {
+              loadingIndicator.style.opacity = '0';
+              setTimeout(function() {
+                loadingIndicator.style.display = 'none';
+              }, 300);
+            }
+          }, 500);
+        } catch (e) {
+          console.error('访问iframe内容失败:', e);
+          showError('加载失败', '无法正确加载管理页面内容，可能是由于跨域限制。');
+        }
+      };
+      
+      // 处理iframe加载错误
+      iframe.onerror = function() {
+        if (loadTimeout) clearTimeout(loadTimeout);
+        showError('加载失败', '无法加载管理页面，请检查网络连接或重试。');
+      };
+      
+      // 设置iframe源
+      iframe.src = targetUrl;
+      
+      // 添加到页面
+      document.querySelector('.content-container').appendChild(iframe);
+    }
+    
+    // 页面加载完成后初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      loadContentFrame();
+    });
+  </script>
+</body>
+</html> 

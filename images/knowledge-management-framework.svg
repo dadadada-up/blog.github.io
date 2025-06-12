@@ -1,0 +1,72 @@
+<svg width="600" height="400" xmlns="http://www.w3.org/2000/svg">
+  <style>
+    text {
+      font-family: 'Arial', sans-serif;
+      font-size: 14px;
+    }
+    .title {
+      font-size: 16px;
+      font-weight: bold;
+      text-anchor: middle;
+    }
+    .subtitle {
+      font-size: 12px;
+      text-anchor: middle;
+    }
+    .arrow-text {
+      font-size: 12px;
+      fill: #444;
+    }
+  </style>
+  
+  <!-- 输入源 -->
+  <rect x="50" y="80" width="140" height="80" fill="#F9E79F" rx="8" stroke="#E5D68A" stroke-width="2" />
+  <text x="120" y="110" class="title">输入源</text>
+  <text x="120" y="135" class="subtitle">AI论文/行业报告/实践案例</text>
+  
+  <!-- 知识仓库 -->
+  <rect x="230" y="80" width="140" height="80" fill="#AED6F1" rx="8" stroke="#99C1DE" stroke-width="2" />
+  <text x="300" y="110" class="title">知识仓库</text>
+  <text x="300" y="135" class="subtitle">Notion/Obsidian/Readwise</text>
+  
+  <!-- 处理引擎 -->
+  <rect x="230" y="240" width="140" height="80" fill="#ABEBC6" rx="8" stroke="#97D8B3" stroke-width="2" />
+  <text x="300" y="270" class="title">处理引擎</text>
+  <text x="300" y="295" class="subtitle">标签化/关联/去重</text>
+  
+  <!-- 价值输出 -->
+  <rect x="410" y="240" width="140" height="80" fill="#F5B7B1" rx="8" stroke="#E2A59E" stroke-width="2" />
+  <text x="480" y="270" class="title">价值输出</text>
+  <text x="480" y="295" class="subtitle">博客/方案/产品设计</text>
+  
+  <!-- 箭头 -->
+  <!-- 输入源 -> 知识仓库 -->
+  <path d="M190 120 L230 120" stroke="#444" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="210" y="110" class="arrow-text">捕获</text>
+  
+  <!-- 知识仓库 -> 处理引擎 -->
+  <path d="M300 160 L300 240" stroke="#444" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="310" y="200" class="arrow-text">结构化</text>
+  
+  <!-- 处理引擎 -> 价值输出 -->
+  <path d="M370 280 L410 280" stroke="#444" stroke-width="2" marker-end="url(#arrow)" />
+  <text x="390" y="270" class="arrow-text">创造</text>
+  
+  <!-- 价值输出 -> 输入源 (反馈循环) -->
+  <path d="M480 240 L480 40 L120 40 L120 80" stroke="#444" stroke-width="2" fill="none" marker-end="url(#arrow)" />
+  <text x="300" y="30" class="arrow-text">反馈循环/用户互动/效果验证</text>
+  
+  <!-- 工具矩阵说明 -->
+  <rect x="410" y="80" width="140" height="100" fill="#EEEEEE" rx="8" stroke="#DDDDDD" stroke-width="2" />
+  <text x="480" y="100" class="title">工具矩阵</text>
+  <text x="430" y="125" text-anchor="start" font-size="12px">• Notion（中央仓库）</text>
+  <text x="430" y="145" text-anchor="start" font-size="12px">• Obsidian（网状链接）</text>
+  <text x="430" y="165" text-anchor="start" font-size="12px">• Readwise（信息聚合）</text>
+  
+  <!-- 箭头定义 -->
+  <defs>
+    <marker id="arrow" markerWidth="10" markerHeight="10" refX="9" refY="3" orient="auto" markerUnits="strokeWidth">
+      <path d="M0,0 L0,6 L9,3 z" fill="#444" />
+    </marker>
+  </defs>
+</svg> 

@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>语雀导入 - 博客管理系统</title>
+  <link rel="stylesheet" href="/admin/modern-admin.css">
+  
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <style>
+    /* 内容样式 */
+    .import-container {
+      background-color: white;
+      border-radius: 4px;
+      box-shadow: 0 2px 12px 0 rgba(0, 0, 0, 0.1);
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+    
+    .import-header {
+      padding-bottom: 15px;
+      margin-bottom: 20px;
+      border-bottom: 1px solid #ebeef5;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    
+    .import-title {
+      font-size: 18px;
+      color: #303133;
+      margin: 0;
+    }
+    
+    .import-description {
+      margin-bottom: 20px;
+      color: #606266;
+      line-height: 1.6;
+    }
+    
+    .import-note {
+      background-color: #f8f8f8;
+      border-left: 4px solid #409EFF;
+      padding: 12px 15px;
+      margin-bottom: 20px;
+      color: #606266;
+      border-radius: 0 4px 4px 0;
+    }
+    
+    .form-group {
+      margin-bottom: 20px;
+    }
+    
+    .form-label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: bold;
+      color: #303133;
+    }
+    
+    .form-input {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #dcdfe6;
+      border-radius: 4px;
+      font-size: 14px;
+      transition: border-color 0.3s;
+    }
+    
+    .form-input:focus {
+      outline: none;
+      border-color: #409EFF;
+    }
+    
+    .import-btn {
+      padding: 10px 20px;
+      background-color: #409EFF;
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+    }
+    
+    .import-btn.success {
+      background-color: #67c23a;
+    }
+    
+    .import-btn.cancel {
+      background-color: #f56c6c;
+    }
+    
+    .import-options {
+      margin-top: 10px;
+    }
+    
+    .import-option {
+      display: flex;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    
+    .import-option input {
+      margin-right: 8px;
+    }
+    
+    .warning-text {
+      color: #e6a23c;
+      font-weight: bold;
+    }
+    
+    /* 导入方式选择器 */
+    .import-tabs {
+      display: flex;
+      border-bottom: 1px solid #dcdfe6;
+      margin-bottom: 20px;
+    }
+    
+    .import-tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border-bottom: 2px solid transparent;
+      transition: all 0.3s;
+      font-weight: 500;
+      color: #606266;
+    }
+    
+    .import-tab.active {
+      color: #409EFF;
+      border-bottom-color: #409EFF;
+    }
+    
+    /* 文件上传区域 */
+    .file-upload-area {
+      border: 2px dashed #dcdfe6;
+      border-radius: 6px;
+      padding: 30px;
+      text-align: center;
+      transition: all 0.3s;
+      cursor: pointer;
+      margin-bottom: 20px;
+    }
+    
+    .file-upload-area:hover {
+      border-color: #409EFF;
+    }
+    
+    .file-upload-area.active {
+      border-color: #409EFF;
+      background-color: rgba(64, 158, 255, 0.05);
+    }
+    
+    .file-upload-icon {
+      font-size: 48px;
+      color: #909399;
+      margin-bottom: 15px;
+    }
+    
+    .file-upload-text {
+      margin-bottom: 15px;
+      color: #606266;
+    }
+    
+    .file-list {
+      margin-top: 20px;
+    }
+    
+    .file-item {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background-color: #f5f7fa;
+      border-radius: 4px;
+      margin-bottom: 10px;
+    }
+    
+    .file-item-info {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    
+    .file-item-icon {
+      color: #409EFF;
+    }
+    
+    .file-item-name {
+      font-size: 14px;
+      color: #303133;
+    }
+    
+    .file-item-size {
+      font-size: 12px;
+      color: #909399;
+    }
+    
+    .file-item-remove {
+      color: #f56c6c;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- 顶部导航栏 -->
+    <header class="admin-header">
+      <div class="admin-logo">博客管理系统</div>
+      <div class="admin-header-actions">
+        <a href="/" target="_blank" class="dashboard-button">
+          <i class="fas fa-external-link-alt"></i> 查看网站
+        </a>
+        <a href="javascript:void(0);" onclick="logout()" class="logout-button">
+          <i class="fas fa-sign-out-alt"></i> 注销
+        </a>
+      </div>
+    </header>
+    
+    <!-- 侧边导航栏 -->
+    <aside class="admin-sidebar">
+      <ul class="admin-menu">
+        <li>
+          <a href="/admin/dashboard.html" class="admin-menu-item">
+            <i class="fas fa-tachometer-alt admin-menu-icon"></i>
+            仪表盘
+          </a>
+        </li>
+        <li>
+          <a href="/admin/hexo-style-manager.html?type=post" class="admin-menu-item">
+            <i class="fas fa-file-alt admin-menu-icon"></i>
+            文章管理
+          </a>
+        </li>
+        <li>
+          <a href="/admin/hexo-style-manager.html?type=page" class="admin-menu-item">
+            <i class="fas fa-copy admin-menu-icon"></i>
+            页面管理
+          </a>
+        </li>
+        <li class="admin-menu-divider"></li>
+        <li>
+          <a href="javascript:void(0);" onclick="deployWebsite()" class="admin-menu-item">
+            <i class="fas fa-rocket admin-menu-icon"></i>
+            部署网站
+          </a>
+        </li>
+        <li>
+          <a href="/admin/backup.html" class="admin-menu-item">
+            <i class="fas fa-database admin-menu-icon"></i>
+            备份恢复
+          </a>
+        </li>
+        <li class="admin-menu-divider"></li>
+        <li>
+          <a href="/admin/cover-generator.html" class="admin-menu-item">
+            <i class="fas fa-image admin-menu-icon"></i>
+            封面生成
+          </a>
+        </li>
+        <li>
+          <a href="/admin/hexo-style-manager.html?type=settings" class="admin-menu-item">
+            <i class="fas fa-cog admin-menu-icon"></i>
+            系统设置
+          </a>
+        </li>
+      </ul>
+    </aside>
+    
+    <!-- 移动端菜单按钮 -->
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 主内容区域 -->
+    <main class="admin-main">
+      <div style="padding: 20px;">
+        <h1 class="dashboard-title">语雀导入</h1>
+        
+        <div class="import-container">
+          <div class="import-header">
+            <h2 class="import-title">导入语雀知识库</h2>
+          </div>
+          
+          <div class="import-description">
+            使用此功能可以将语雀知识库中的文档导入到您的博客中。
+          </div>
+          
+          <!-- 导入方式选择器 -->
+          <div class="import-tabs">
+            <div class="import-tab active" data-tab="api" onclick="switchTab('api')">API导入</div>
+            <div class="import-tab" data-tab="file" onclick="switchTab('file')">Markdown导入</div>
+          </div>
+          
+          <!-- API导入面板 -->
+          <div id="apiImportPanel">
+            <div class="import-note">
+              <p><span class="warning-text">注意：</span> 使用API导入需要语雀API Token，并且知识库已设置为公开或有相应的访问权限。</p>
+            </div>
+            
+            <form id="yuqueImportForm">
+              <div class="form-group">
+                <label class="form-label">语雀知识库地址</label>
+                <input type="text" class="form-input" placeholder="例如: https://www.yuque.com/username/repo" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">API Token</label>
+                <input type="text" class="form-input" placeholder="填写您的语雀API Token" required>
+              </div>
+              
+              <div class="form-group">
+                <label class="form-label">导入选项</label>
+                <div class="import-options">
+                  <label class="import-option">
+                    <input type="checkbox" checked> 导入图片
+                  </label>
+                  <label class="import-option">
+                    <input type="checkbox" checked> 保留原文档更新时间
+                  </label>
+                  <label class="import-option">
+                    <input type="checkbox"> 导入为草稿
+                  </label>
+                </div>
+              </div>
+              
+              <div style="display: flex; gap: 10px; margin-top: 30px;">
+                <button type="button" class="import-btn" onclick="startApiImport()">
+                  <i class="fas fa-download"></i> 开始导入
+                </button>
+                <button type="button" class="import-btn cancel" onclick="location.href='/admin/hexo-style-manager.html?type=post'">
+                  <i class="fas fa-arrow-left"></i> 返回文章管理
+                </button>
+              </div>
+            </form>
+          </div>
+          
+          <!-- Markdown导入面板 -->
+          <div id="fileImportPanel" style="display: none;">
+            <div class="import-note">
+              <p><span class="warning-text">注意：</span> 使用Markdown导入可以直接上传从语雀导出的Markdown文件。</p>
+            </div>
+            
+            <div class="file-upload-area" id="fileDropArea" onclick="triggerFileInput()">
+              <div class="file-upload-icon">
+                <i class="fas fa-file-upload"></i>
+              </div>
+              <div class="file-upload-text">
+                拖拽Markdown文件到这里，或点击选择文件
+              </div>
+              <input type="file" id="fileInput" accept=".md,.markdown" multiple style="display: none;" onchange="handleFiles(this.files)">
+            </div>
+            
+            <div class="file-list" id="fileList" style="display: none;"></div>
+            
+            <div class="form-group">
+              <label class="form-label">导入选项</label>
+              <div class="import-options">
+                <label class="import-option">
+                  <input type="checkbox" checked> 保留原文件名作为标题
+                </label>
+                <label class="import-option">
+                  <input type="checkbox" checked> 处理语雀图片链接
+                </label>
+                <label class="import-option">
+                  <input type="checkbox"> 导入为草稿
+                </label>
+              </div>
+            </div>
+            
+            <div style="display: flex; gap: 10px; margin-top: 30px;">
+              <button type="button" class="import-btn" id="startFileImportBtn" onclick="startFileImport()" disabled>
+                <i class="fas fa-download"></i> 开始导入
+              </button>
+              <button type="button" class="import-btn cancel" onclick="location.href='/admin/hexo-style-manager.html?type=post'">
+                <i class="fas fa-arrow-left"></i> 返回文章管理
+              </button>
+            </div>
+          </div>
+        </div>
+        
+        <!-- 导入进度和结果 -->
+        <div id="importResult" style="display: none;" class="import-container">
+          <div class="import-header">
+            <h2 class="import-title">导入进度</h2>
+          </div>
+          
+          <div id="importProgress">
+            <div style="margin-bottom: 15px;">
+              <div>导入中，请稍候...</div>
+              <div style="margin-top: 10px; height: 6px; background-color: #f2f6fc; border-radius: 3px;">
+                <div id="progressBar" style="width: 0%; height: 100%; background-color: #409EFF; border-radius: 3px; transition: width 0.3s;"></div>
+              </div>
+            </div>
+            
+            <div id="importStatus">准备导入...</div>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // 检查登录状态
+    if (localStorage.getItem('adminLoggedIn') !== 'true') {
+      window.location.href = '/admin/login.html';
+    }
+    
+    // 初始化
+    document.addEventListener('DOMContentLoaded', function() {
+      initMobileMenu();
+      initFileUploadArea();
+    });
+    
+    // 初始化移动端菜单
+    function initMobileMenu() {
+      const menuToggle = document.getElementById('menuToggle');
+      const sidebar = document.querySelector('.admin-sidebar');
+      
+      if (menuToggle && sidebar) {
+        menuToggle.addEventListener('click', function() {
+          sidebar.classList.toggle('open');
+        });
+        
+        // 点击主内容区域关闭菜单
+        document.querySelector('.admin-main').addEventListener('click', function() {
+          if (sidebar.classList.contains('open')) {
+            sidebar.classList.remove('open');
+          }
+        });
+      }
+    }
+    
+    // 初始化文件上传区域
+    function initFileUploadArea() {
+      const dropArea = document.getElementById('fileDropArea');
+      
+      ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, preventDefaults, false);
+      });
+      
+      function preventDefaults(e) {
+        e.preventDefault();
+        e.stopPropagation();
+      }
+      
+      ['dragenter', 'dragover'].forEach(eventName => {
+        dropArea.addEventListener(eventName, highlight, false);
+      });
+      
+      ['dragleave', 'drop'].forEach(eventName => {
+        dropArea.addEventListener(eventName, unhighlight, false);
+      });
+      
+      function highlight() {
+        dropArea.classList.add('active');
+      }
+      
+      function unhighlight() {
+        dropArea.classList.remove('active');
+      }
+      
+      dropArea.addEventListener('drop', handleDrop, false);
+    }
+    
+    // 处理拖放文件
+    function handleDrop(e) {
+      const dt = e.dataTransfer;
+      const files = dt.files;
+      handleFiles(files);
+    }
+    
+    // 触发文件选择
+    function triggerFileInput() {
+      document.getElementById('fileInput').click();
+    }
+    
+    // 处理选择的文件
+    function handleFiles(files) {
+      const validFiles = Array.from(files).filter(file => 
+        file.type === 'text/markdown' || 
+        file.name.endsWith('.md') || 
+        file.name.endsWith('.markdown')
+      );
+      
+      if (validFiles.length === 0) {
+        alert('请选择有效的Markdown文件（.md或.markdown）');
+        return;
+      }
+      
+      const fileList = document.getElementById('fileList');
+      fileList.innerHTML = '';
+      fileList.style.display = 'block';
+      
+      validFiles.forEach(file => {
+        const fileItem = document.createElement('div');
+        fileItem.className = 'file-item';
+        fileItem.innerHTML = `
+          <div class="file-item-info">
+            <div class="file-item-icon">
+              <i class="fas fa-file-alt"></i>
+            </div>
+            <div>
+              <div class="file-item-name">${file.name}</div>
+              <div class="file-item-size">${formatFileSize(file.size)}</div>
+            </div>
+          </div>
+          <div class="file-item-remove" onclick="removeFile(this)">
+            <i class="fas fa-times"></i>
+          </div>
+        `;
+        fileItem.dataset.fileName = file.name;
+        fileList.appendChild(fileItem);
+      });
+      
+      // 启用导入按钮
+      document.getElementById('startFileImportBtn').disabled = false;
+    }
+    
+    // 移除文件
+    function removeFile(element) {
+      const fileItem = element.closest('.file-item');
+      fileItem.remove();
+      
+      // 如果没有文件了，隐藏文件列表并禁用导入按钮
+      const fileList = document.getElementById('fileList');
+      if (fileList.children.length === 0) {
+        fileList.style.display = 'none';
+        document.getElementById('startFileImportBtn').disabled = true;
+      }
+    }
+    
+    // 格式化文件大小
+    function formatFileSize(bytes) {
+      if (bytes < 1024) return bytes + ' B';
+      else if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+      else return (bytes / 1048576).toFixed(1) + ' MB';
+    }
+    
+    // 切换导入方式
+    function switchTab(tab) {
+      // 更新标签样式
+      document.querySelectorAll('.import-tab').forEach(element => {
+        element.classList.toggle('active', element.dataset.tab === tab);
+      });
+      
+      // 显示/隐藏相应面板
+      document.getElementById('apiImportPanel').style.display = tab === 'api' ? 'block' : 'none';
+      document.getElementById('fileImportPanel').style.display = tab === 'file' ? 'block' : 'none';
+    }
+    
+    // 开始API导入
+    function startApiImport() {
+      const form = document.getElementById('yuqueImportForm');
+      const inputs = form.querySelectorAll('input[type="text"]');
+      let isValid = true;
+      
+      inputs.forEach(input => {
+        if (!input.value.trim()) {
+          input.style.borderColor = '#f56c6c';
+          isValid = false;
+        } else {
+          input.style.borderColor = '#dcdfe6';
+        }
+      });
+      
+      if (!isValid) {
+        alert('请填写所有必填字段');
+        return;
+      }
+      
+      // 获取导入选项 - 修复选择器
+      const checkboxes = document.querySelectorAll('#apiImportPanel .import-option input[type="checkbox"]');
+      const importImages = checkboxes[0] ? checkboxes[0].checked : true;
+      const keepOriginalTime = checkboxes[1] ? checkboxes[1].checked : true;
+      const importAsDraft = checkboxes[2] ? checkboxes[2].checked : false;
+      
+      // 获取知识库地址和API Token
+      const repoUrl = form.querySelector('input[type="text"]:nth-of-type(1)').value;
+      const apiToken = form.querySelector('input[type="text"]:nth-of-type(2)').value;
+      
+      // 显示导入进度
+      document.getElementById('importResult').style.display = 'block';
+      
+      // 模拟API导入
+      processApiImport(repoUrl, apiToken, importImages, keepOriginalTime, importAsDraft);
+    }
+    
+    // 处理API导入
+    function processApiImport(repoUrl, apiToken, importImages, keepOriginalTime, importAsDraft) {
+      let progress = 0;
+      const progressBar = document.getElementById('progressBar');
+      const importStatus = document.getElementById('importStatus');
+      
+      // 添加日志区域
+      const logContainer = document.createElement('div');
+      logContainer.id = 'importLogContainer';
+      logContainer.style.marginTop = '20px';
+      logContainer.style.padding = '10px';
+      logContainer.style.backgroundColor = '#f8f8f8';
+      logContainer.style.borderRadius = '4px';
+      logContainer.style.maxHeight = '200px';
+      logContainer.style.overflowY = 'auto';
+      logContainer.style.fontSize = '12px';
+      logContainer.style.fontFamily = 'monospace';
+      logContainer.style.whiteSpace = 'pre-wrap';
+      logContainer.style.display = 'none';
+      document.getElementById('importProgress').appendChild(logContainer);
+      
+      // 添加显示/隐藏日志按钮
+      const logToggle = document.createElement('button');
+      logToggle.innerText = '显示导入日志';
+      logToggle.style.marginTop = '10px';
+      logToggle.style.padding = '5px 10px';
+      logToggle.style.border = 'none';
+      logToggle.style.borderRadius = '4px';
+      logToggle.style.backgroundColor = '#909399';
+      logToggle.style.color = 'white';
+      logToggle.style.cursor = 'pointer';
+      logToggle.style.fontSize = '12px';
+      logToggle.onclick = function() {
+        const logContainer = document.getElementById('importLogContainer');
+        if (logContainer.style.display === 'none') {
+          logContainer.style.display = 'block';
+          this.innerText = '隐藏导入日志';
+        } else {
+          logContainer.style.display = 'none';
+          this.innerText = '显示导入日志';
+        }
+      };
+      document.getElementById('importProgress').appendChild(logToggle);
+      
+      // 添加日志函数
+      function addLog(message, type = 'info') {
+        const logContainer = document.getElementById('importLogContainer');
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.style.marginBottom = '5px';
+        
+        // 根据日志类型设置颜色
+        switch(type) {
+          case 'error':
+            logEntry.style.color = '#f56c6c';
+            break;
+          case 'success':
+            logEntry.style.color = '#67c23a';
+            break;
+          case 'warning':
+            logEntry.style.color = '#e6a23c';
+            break;
+          default:
+            logEntry.style.color = '#606266';
+        }
+        
+        logEntry.innerText = `[${timestamp}] ${message}`;
+        logContainer.appendChild(logEntry);
+        
+        // 自动滚动到底部
+        logContainer.scrollTop = logContainer.scrollHeight;
+        
+        // 同时在控制台记录
+        console.log(`[语雀导入] ${message}`);
+      }
+      
+      // 模拟导入的文章数据
+      const importedPosts = [];
+      
+      // 模拟文章数量
+      const articleCount = Math.floor(Math.random() * 5) + 3; // 3-7篇文章
+      
+      addLog(`开始导入语雀知识库: ${repoUrl}`, 'info');
+      addLog(`文章导入选项: 导入图片=${importImages}, 保留原时间=${keepOriginalTime}, 导入为草稿=${importAsDraft}`, 'info');
+      
+      // 模拟进度更新
+      const interval = setInterval(() => {
+        progress += Math.random() * 10;
+        
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          importStatus.innerHTML = `导入完成！共导入${articleCount}篇文章。`;
+          importStatus.style.color = '#67c23a';
+          
+          addLog(`导入完成，成功导入 ${articleCount} 篇文章`, 'success');
+          
+          // 添加"返回文章管理"按钮
+          const buttonContainer = document.createElement('div');
+          buttonContainer.style.marginTop = '20px';
+          buttonContainer.innerHTML = `
+            <button class="import-btn success" onclick="redirectToPostList()">
+              <i class="fas fa-check-circle"></i> 查看导入的文章
+            </button>
+          `;
+          document.getElementById('importProgress').appendChild(buttonContainer);
+          
+          // 模拟文章数据
+          const titles = [
+            '如何使用Hexo搭建个人博客',
+            'Markdown高级语法指南',
+            'JavaScript编程技巧总结',
+            '2023年最流行的前端框架对比',
+            'CSS Grid布局详解',
+            'Git工作流最佳实践',
+            'Node.js性能优化策略'
+          ];
+          
+          // 生成随机文章
+          for (let i = 0; i < articleCount; i++) {
+            const title = titles[i % titles.length] + (i >= titles.length ? ` (${Math.floor(i/titles.length) + 1})` : '');
+            const date = keepOriginalTime 
+              ? new Date(Date.now() - Math.random() * 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10)
+              : new Date().toISOString().slice(0, 10);
+            
+            const postId = 'post' + Date.now() + i;
+            
+            importedPosts.push({
+              id: postId,
+              title: title,
+              content: `# ${title}\n\n这是从语雀API导入的文章内容，包含了Markdown格式的正文。\n\n## 示例标题\n\n这是一段示例文本，用于模拟导入的内容。${importImages ? '\n\n![示例图片](https://example.com/image.jpg)' : ''}`,
+              date: date,
+              tags: '语雀,API导入,技术',
+              status: importAsDraft ? 'draft' : 'published',
+              originalUrl: `${repoUrl}/article${i+1}`,
+              filename: generateSafeFilename(title) + '.md'
+            });
+            
+            addLog(`创建文章: ${title} (ID: ${postId})`, 'info');
+          }
+          
+          // 保存导入的文章到localStorage
+          localStorage.setItem('importedPosts', JSON.stringify(importedPosts));
+          addLog(`保存 ${importedPosts.length} 篇文章到本地存储`, 'info');
+          
+          // 添加提示信息，说明文件系统同步
+          const syncNote = document.createElement('div');
+          syncNote.style.marginTop = '15px';
+          syncNote.style.padding = '10px 15px';
+          syncNote.style.backgroundColor = '#f0f9eb';
+          syncNote.style.color = '#67c23a';
+          syncNote.style.borderRadius = '4px';
+          syncNote.style.fontSize = '14px';
+          syncNote.innerHTML = '注意：文章已导入到系统，返回后请点击<strong>同步文件</strong>按钮将文章保存到文件系统，以便前台博客能够显示。';
+          document.getElementById('importProgress').appendChild(syncNote);
+          
+          // 标记需要文件系统同步
+          localStorage.setItem('needsFileSync', 'true');
+          
+          // 2秒后自动跳转到文章列表
+          setTimeout(() => {
+            addLog('准备跳转到文章列表页面...', 'info');
+            redirectToPostList();
+          }, 4000); // 延长等待时间，让用户看到提示
+        }
+        
+        // 更新进度条和状态
+        const steps = [
+          '连接语雀API...',
+          '获取文档列表...',
+          '下载文档内容...',
+          '处理文档内容...',
+          '转换为Markdown格式...',
+          '处理文档图片...',
+          '创建本地文件...',
+          '导入完成！'
+        ];
+        
+        const stepIndex = Math.floor((progress / 100) * steps.length);
+        const currentStep = steps[Math.min(stepIndex, steps.length - 1)];
+        importStatus.textContent = currentStep;
+        
+        // 每次进度更新时也添加日志
+        if (progress % 20 < 10) { // 减少日志数量，大约每20%进度记录一次
+          addLog(`进度 ${Math.floor(progress)}%: ${currentStep}`, 'info');
+        }
+        
+        progressBar.style.width = `${progress}%`;
+      }, 800);
+    }
+    
+    // 生成安全的文件名
+    function generateSafeFilename(title) {
+      // 移除非字母数字字符，将空格替换为横线
+      let filename = title
+        .toLowerCase()
+        .replace(/[^\w\s]/g, '') // 移除所有非字母数字和空格的字符
+        .replace(/\s+/g, '-')    // 将空格替换为横线
+        .trim()                  // 移除前后空格
+        .replace(/-+/g, '-');    // 将多个连续横线替换为单个横线
+      
+      // 确保文件名不为空且不以横线开头或结尾
+      filename = filename.replace(/^-+|-+$/g, '');
+      
+      // 如果处理后的文件名为空或太短，使用时间戳
+      if (!filename || filename.length < 2) {
+        filename = 'yuque-import-' + Date.now().toString().slice(-6);
+      }
+      
+      return filename;
+    }
+    
+    // 跳转到文章列表页面
+    function redirectToPostList() {
+      // 设置一个标记，表示文章刚刚导入，避免在列表页面立即清除导入数据
+      localStorage.setItem('justImported', 'true');
+      console.log('[语雀导入] 跳转到文章列表页面，justImported=true');
+      window.location.href = '/admin/hexo-style-manager.html?type=post';
+    }
+    
+    // 开始文件导入
+    function startFileImport() {
+      const fileList = document.getElementById('fileList');
+      if (fileList.children.length === 0) {
+        alert('请先选择要导入的Markdown文件');
+        return;
+      }
+      
+      // 获取所有选择的文件
+      const files = Array.from(document.querySelectorAll('.file-item')).map(item => item.dataset.fileName);
+      
+      // 获取导入选项 - 修复选择器
+      const checkboxes = document.querySelectorAll('#fileImportPanel .import-option input[type="checkbox"]');
+      const useFilenameAsTitle = checkboxes[0] ? checkboxes[0].checked : true;
+      const processYuqueImages = checkboxes[1] ? checkboxes[1].checked : true;
+      const importAsDraft = checkboxes[2] ? checkboxes[2].checked : false;
+      
+      // 显示导入进度
+      document.getElementById('importResult').style.display = 'block';
+      
+      // 模拟处理文件
+      processFiles(files, useFilenameAsTitle, processYuqueImages, importAsDraft);
+    }
+    
+    // 处理文件导入
+    function processFiles(files, useFilenameAsTitle, processYuqueImages, importAsDraft) {
+      let progress = 0;
+      const progressBar = document.getElementById('progressBar');
+      const importStatus = document.getElementById('importStatus');
+      
+      // 添加日志区域
+      const logContainer = document.createElement('div');
+      logContainer.id = 'importLogContainer';
+      logContainer.style.marginTop = '20px';
+      logContainer.style.padding = '10px';
+      logContainer.style.backgroundColor = '#f8f8f8';
+      logContainer.style.borderRadius = '4px';
+      logContainer.style.maxHeight = '200px';
+      logContainer.style.overflowY = 'auto';
+      logContainer.style.fontSize = '12px';
+      logContainer.style.fontFamily = 'monospace';
+      logContainer.style.whiteSpace = 'pre-wrap';
+      logContainer.style.display = 'none';
+      document.getElementById('importProgress').appendChild(logContainer);
+      
+      // 添加显示/隐藏日志按钮
+      const logToggle = document.createElement('button');
+      logToggle.innerText = '显示导入日志';
+      logToggle.style.marginTop = '10px';
+      logToggle.style.padding = '5px 10px';
+      logToggle.style.border = 'none';
+      logToggle.style.borderRadius = '4px';
+      logToggle.style.backgroundColor = '#909399';
+      logToggle.style.color = 'white';
+      logToggle.style.cursor = 'pointer';
+      logToggle.style.fontSize = '12px';
+      logToggle.onclick = function() {
+        const logContainer = document.getElementById('importLogContainer');
+        if (logContainer.style.display === 'none') {
+          logContainer.style.display = 'block';
+          this.innerText = '隐藏导入日志';
+        } else {
+          logContainer.style.display = 'none';
+          this.innerText = '显示导入日志';
+        }
+      };
+      document.getElementById('importProgress').appendChild(logToggle);
+      
+      // 添加日志函数
+      function addLog(message, type = 'info') {
+        const logContainer = document.getElementById('importLogContainer');
+        const timestamp = new Date().toLocaleTimeString();
+        const logEntry = document.createElement('div');
+        logEntry.style.marginBottom = '5px';
+        
+        // 根据日志类型设置颜色
+        switch(type) {
+          case 'error':
+            logEntry.style.color = '#f56c6c';
+            break;
+          case 'success':
+            logEntry.style.color = '#67c23a';
+            break;
+          case 'warning':
+            logEntry.style.color = '#e6a23c';
+            break;
+          default:
+            logEntry.style.color = '#606266';
+        }
+        
+        logEntry.innerText = `[${timestamp}] ${message}`;
+        logContainer.appendChild(logEntry);
+        
+        // 自动滚动到底部
+        logContainer.scrollTop = logContainer.scrollHeight;
+        
+        // 同时在控制台记录
+        console.log(`[语雀导入] ${message}`);
+      }
+      
+      // 模拟导入的文章数据
+      const importedPosts = [];
+      
+      addLog(`开始导入 ${files.length} 个Markdown文件`, 'info');
+      addLog(`导入选项: 使用文件名作为标题=${useFilenameAsTitle}, 处理语雀图片=${processYuqueImages}, 导入为草稿=${importAsDraft}`, 'info');
+      
+      // 模拟进度更新
+      const interval = setInterval(() => {
+        progress += Math.random() * 15;
+        
+        if (progress >= 100) {
+          progress = 100;
+          clearInterval(interval);
+          
+          importStatus.innerHTML = `导入完成！共导入${files.length}篇文章。`;
+          importStatus.style.color = '#67c23a';
+          
+          addLog(`导入完成，成功导入 ${files.length} 篇文章`, 'success');
+          
+          // 添加"返回文章管理"按钮
+          const buttonContainer = document.createElement('div');
+          buttonContainer.style.marginTop = '20px';
+          buttonContainer.innerHTML = `
+            <button class="import-btn success" onclick="redirectToPostList()">
+              <i class="fas fa-check-circle"></i> 查看导入的文章
+            </button>
+          `;
+          document.getElementById('importProgress').appendChild(buttonContainer);
+          
+          // 保存导入的文章数据到localStorage
+          for (let i = 0; i < files.length; i++) {
+            const fileName = files[i];
+            const title = useFilenameAsTitle ? fileName.replace(/\.md$|\.markdown$/i, '') : `从语雀导入的文章 ${i+1}`;
+            const postId = 'post' + Date.now() + i;
+            
+            importedPosts.push({
+              id: postId,
+              title: title,
+              content: `# ${title}\n\n这是从语雀导入的文章内容，包含了Markdown格式的正文。\n\n## 示例标题\n\n这是一段示例文本，用于模拟导入的内容。`,
+              date: new Date().toISOString().slice(0, 10),
+              tags: '语雀,导入',
+              status: importAsDraft ? 'draft' : 'published',
+              originalUrl: 'https://www.yuque.com/example/document',
+              filename: generateSafeFilename(title) + '.md'
+            });
+            
+            addLog(`创建文章: ${title} (ID: ${postId})`, 'info');
+          }
+          
+          // 保存导入的文章到localStorage
+          localStorage.setItem('importedPosts', JSON.stringify(importedPosts));
+          addLog(`保存 ${importedPosts.length} 篇文章到本地存储`, 'info');
+          
+          // 添加提示信息，说明文件系统同步
+          const syncNote = document.createElement('div');
+          syncNote.style.marginTop = '15px';
+          syncNote.style.padding = '10px 15px';
+          syncNote.style.backgroundColor = '#f0f9eb';
+          syncNote.style.color = '#67c23a';
+          syncNote.style.borderRadius = '4px';
+          syncNote.style.fontSize = '14px';
+          syncNote.innerHTML = '注意：文章已导入到系统，返回后请点击<strong>同步文件</strong>按钮将文章保存到文件系统，以便前台博客能够显示。';
+          document.getElementById('importProgress').appendChild(syncNote);
+          
+          // 标记需要文件系统同步
+          localStorage.setItem('needsFileSync', 'true');
+          
+          // 2秒后自动跳转到文章列表
+          setTimeout(() => {
+            addLog('准备跳转到文章列表页面...', 'info');
+            redirectToPostList();
+          }, 4000); // 延长等待时间，让用户看到提示
+        }
+        
+        // 更新进度条和状态
+        const steps = [
+          '读取文件内容...',
+          '解析Markdown文件...',
+          '提取文章元数据...',
+          '处理文档内容...',
+          '处理语雀图片链接...',
+          '创建文章对象...',
+          '导入完成！'
+        ];
+        
+        const stepIndex = Math.floor((progress / 100) * steps.length);
+        const currentStep = steps[Math.min(stepIndex, steps.length - 1)];
+        importStatus.textContent = currentStep;
+        
+        // 每次进度更新时也添加日志
+        if (progress % 20 < 10) { // 减少日志数量，大约每20%进度记录一次
+          addLog(`进度 ${Math.floor(progress)}%: ${currentStep}`, 'info');
+        }
+        
+        progressBar.style.width = `${progress}%`;
+      }, 600);
+    }
+    
+    // 部署网站
+    function deployWebsite() {
+      if (confirm('确定要部署网站吗？')) {
+        // 这里应该调用部署API
+        alert('部署请求已发送，请稍候查看结果。');
+      }
+    }
+    
+    // 注销
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = '/admin/login.html';
+    }
+  </script>
+</body>
+</html> 

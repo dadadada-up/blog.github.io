@@ -1,0 +1,36 @@
+/**
+ * 系统设置页面样式修复
+ * 这个文件专门用于修复系统设置页面的标题样式
+ */
+
+/* 强制应用顶部标题样式 - 使用最高优先级 */
+#pageTitle,
+.admin-title,
+#adminFrame .admin-title,
+.admin-header .admin-title,
+.admin-logo,
+.admin-header .admin-logo {
+  font-size: 20px !important;
+  font-weight: bold !important;
+  background: linear-gradient(90deg, #409EFF, #67c23a) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  color: transparent !important;
+  text-shadow: none !important;
+  border: none !important;
+}
+
+/* 确保顶部导航栏样式一致 */
+.admin-header {
+  background-color: #409EFF !important;
+  color: white !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+  padding: 0 20px !important;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  z-index: 10 !important;
+  height: auto !important;
+  min-height: 50px !important;
+} 

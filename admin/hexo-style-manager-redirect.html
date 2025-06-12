@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>页面已迁移 - 博客管理系统</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+    }
+    
+    .redirect-container {
+      text-align: center;
+      background: rgba(255, 255, 255, 0.1);
+      padding: 40px;
+      border-radius: 16px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+    }
+    
+    .icon {
+      font-size: 48px;
+      margin-bottom: 20px;
+    }
+    
+    h1 {
+      margin: 0 0 20px 0;
+      font-size: 24px;
+    }
+    
+    p {
+      margin: 0 0 30px 0;
+      opacity: 0.9;
+    }
+    
+    .countdown {
+      font-size: 18px;
+      font-weight: bold;
+      color: #ffd700;
+    }
+  </style>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+<body>
+  <div class="redirect-container">
+    <div class="icon">🔄</div>
+    <h1>页面已迁移</h1>
+    <p>文章管理页面已迁移到新地址</p>
+    <p class="countdown">即将自动跳转... (<span id="countdown">3</span>秒)</p>
+  </div>
+
+  <script>
+    // 解析URL参数
+    const urlParams = new URLSearchParams(window.location.search);
+    const type = urlParams.get('type');
+    
+    // 确定重定向地址
+    let redirectUrl = '/admin/post-management.html';
+    
+    if (type === 'post') {
+      redirectUrl = '/admin/post-management.html';
+    }
+    
+    // 倒计时重定向
+    let countdown = 3;
+    const countdownElement = document.getElementById('countdown');
+    
+    const timer = setInterval(() => {
+      countdown--;
+      countdownElement.textContent = countdown;
+      
+      if (countdown <= 0) {
+        clearInterval(timer);
+        window.location.href = redirectUrl;
+      }
+    }, 1000);
+    
+    // 立即跳转（可选）
+    // window.location.href = redirectUrl;
+  </script>
+</body>
+</html> 

@@ -1,0 +1,257 @@
+/**
+ * 全局标题样式
+ * 确保所有管理页面的顶部标题样式一致
+ */
+
+/* 通用顶部导航样式 - 强制覆盖所有背景色 */
+html, body {
+  margin: 0 !important;
+  padding: 0 !important;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  color: #333;
+  background: #ffffff !important;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+.admin-container {
+  display: grid;
+  grid-template-columns: 200px 1fr;
+  grid-template-rows: 40px 1fr;
+  grid-template-areas:
+    "header header"
+    "sidebar main";
+  height: 100vh;
+  overflow: hidden;
+  background-color: #ffffff !important;
+  margin: 0;
+  padding: 0;
+  background-image: none !important;
+}
+
+.admin-header {
+  grid-area: header;
+  background-color: #409EFF;
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 15px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  height: 40px;
+  margin: 0;
+}
+
+.admin-sidebar {
+  grid-area: sidebar;
+  background-color: #ffffff !important;
+  border-right: 1px solid #e6e6e6;
+  height: calc(100vh - 40px);
+  overflow-y: auto;
+  transition: all 0.3s;
+  box-shadow: none !important;
+  position: fixed;
+  width: 200px;
+  top: 40px;
+  left: 0;
+  z-index: 50;
+  margin: 0;
+  padding: 0;
+  background-image: none !important;
+}
+
+.admin-main {
+  grid-area: main;
+  overflow-y: auto;
+  height: calc(100vh - 40px);
+  margin-left: 200px;
+  padding: 0;
+  background-color: #ffffff !important;
+  display: flex;
+  flex-direction: column;
+  border-left: none;
+  margin-top: 0;
+  background-image: none !important;
+}
+
+.main-content {
+  padding: 0;
+  margin: 0;
+  min-height: calc(100vh - 40px);
+  border-top: none !important;
+  background-color: #ffffff !important;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-image: none !important;
+}
+
+/* 去除内容区域与侧边栏之间的多余空白 */
+.post-list, .editor-container, .notion-settings-container {
+  margin: 0 !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  flex: 1;
+  background-color: #ffffff !important;
+  background-image: none !important;
+}
+
+/* 减少内容区域的内边距 */
+.notion-settings-container {
+  padding: 0 !important;
+  background-color: #ffffff;
+}
+
+.notion-settings-header {
+  margin: 0 !important;
+  padding: 6px 10px !important;
+  border-bottom: 1px solid #ebeef5;
+}
+
+.tab-container {
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+.tabs {
+  margin: 0 !important;
+  padding: 0 5px !important;
+}
+
+.tab-content {
+  padding: 10px !important;
+}
+
+.notion-card {
+  margin-bottom: 5px !important;
+  border-left: none !important;
+  border-right: none !important;
+  border-radius: 0 !important;
+}
+
+.notion-card-body {
+  padding: 6px 10px !important;
+}
+
+/* 减少文章列表页面的内边距 */
+.post-header {
+  padding: 6px 12px !important;
+}
+
+.post-count-info {
+  margin: 0 !important;
+  padding: 3px 12px !important;
+}
+
+.search-filters {
+  padding: 3px 8px !important;
+}
+
+/* 标题文字 */
+.admin-logo, .admin-title, #pageTitle {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ffffff;
+  text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+  border: none;
+  margin: 0;
+  padding: 0;
+  line-height: 1.3;
+  background: none;
+  -webkit-background-clip: initial;
+  -webkit-text-fill-color: initial;
+  background-clip: initial;
+}
+
+/* 标题右侧操作区 */
+.admin-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+/* 按钮样式 */
+.dashboard-button, .logout-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px 10px;
+  background-color: rgba(255, 255, 255, 0.2);
+  color: white;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 13px;
+  text-decoration: none;
+  transition: background-color 0.2s;
+}
+
+.dashboard-button:hover, .logout-button:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.dashboard-button i, .logout-button i {
+  margin-right: 5px;
+}
+
+/* 底部操作区 */
+.bottom-actions {
+  padding: 10px !important;
+  border-top: 1px solid #ebeef5;
+}
+
+/* 移动端适配 */
+@media (max-width: 768px) {
+  .admin-header {
+    padding: 0 10px 0 60px; /* 为菜单按钮留出空间 */
+  }
+  
+  .admin-logo {
+    font-size: 16px;
+  }
+  
+  .admin-header-actions {
+    gap: 4px;
+  }
+  
+  .dashboard-button, .logout-button {
+    padding: 3px 6px;
+    font-size: 12px;
+  }
+  
+  .dashboard-button span, .logout-button span {
+    display: none; /* 在移动端只显示图标 */
+  }
+  
+  .dashboard-button i, .logout-button i {
+    margin-right: 0;
+  }
+  
+  .admin-main {
+    margin-left: 0; /* 移动端下移除左侧边距 */
+  }
+} 
+
+/* 确保所有页面的一致背景色 */
+html, body {
+  background-color: #ffffff !important;
+}
+
+.admin-container, .admin-main, .main-content, 
+.post-list, .editor-container, .notion-settings-container {
+  background-color: #ffffff !important;
+}
+
+/* 确保无缝连接 */
+.admin-sidebar, .admin-main {
+  margin-top: 0 !important;
+  padding-top: 0 !important;
+}
+
+/* 消除任何可能的间隙 */
+* {
+  box-sizing: border-box;
+} 

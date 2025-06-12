@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>封面生成器 - 博客管理</title>
+  <link rel="stylesheet" href="/admin/modern-admin.css">
+  <link rel="stylesheet" href="/admin/css/modern-layout.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+  <link rel="stylesheet" href="/admin/css/global-header.css">
+  <link rel="stylesheet" href="/admin/css/admin-menu.css">
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  <link rel="stylesheet" href="/admin/css/unified-layout.css">
+  
+  <script src="/admin/js/api-interceptor.js"></script>
+  <script src="/admin/js/common-menu.js"></script>
+</head>
+<body>
+  <div class="admin-container">
+    <!-- 顶部导航栏 -->
+    <header class="admin-header">
+      <div class="admin-logo">博客管理系统</div>
+      <div class="admin-header-actions">
+        <a href="/" target="_blank" class="dashboard-button">
+          <i class="fas fa-external-link-alt"></i> 查看网站
+        </a>
+        <a href="javascript:void(0);" onclick="logout()" class="logout-button">
+          <i class="fas fa-sign-out-alt"></i> 注销
+        </a>
+      </div>
+    </header>
+    
+    <!-- 侧边导航栏 - 由common-menu.js动态生成 -->
+    <aside class="admin-sidebar"></aside>
+    
+    <!-- 移动端菜单按钮 -->
+    <button class="menu-toggle" id="menuToggle">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <!-- 主内容区域 -->
+    <main class="admin-main">
+      <div class="admin-card">
+        <div class="admin-card-header">
+          <h2 class="admin-card-title">博客封面生成器</h2>
+        </div>
+        
+        <div class="cover-options">
+          <div class="cover-option active" onclick="switchMethod('title')" id="titleOption">
+            <i class="fas fa-heading" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <h3>标题渲染</h3>
+            <p>根据文章标题生成封面</p>
+          </div>
+          
+          <div class="cover-option" onclick="switchMethod('template')" id="templateOption">
+            <i class="fas fa-images" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <h3>模板库</h3>
+            <p>使用预设模板生成封面</p>
+          </div>
+          
+          <div class="cover-option" onclick="switchMethod('ai')" id="aiOption">
+            <i class="fas fa-robot" style="font-size: 24px; margin-bottom: 10px;"></i>
+            <h3>AI生成</h3>
+            <p>AI根据标题生成封面图</p>
+          </div>
+        </div>
+        
+        <!-- 标题渲染模式 -->
+        <div id="titleMode">
+          <div class="admin-form-group">
+            <label class="admin-form-label">文章标题</label>
+            <input type="text" class="admin-form-input" id="coverTitle" placeholder="输入文章标题" value="使用Hexo搭建个人技术博客">
+          </div>
+          
+          <div class="admin-form-group">
+            <label class="admin-form-label">副标题/标签 (可选)</label>
+            <input type="text" class="admin-form-input" id="coverSubtitle" placeholder="输入副标题或标签" value="技术分享 · 个人成长">
+          </div>
+          
+          <div class="admin-form-group">
+            <label class="admin-form-label">选择模板样式</label>
+            <div class="template-options">
+              <div class="template-option active" onclick="selectTemplate('simple')" id="simpleTemplate">简约</div>
+              <div class="template-option" onclick="selectTemplate('tech')" id="techTemplate">科技</div>
+              <div class="template-option" onclick="selectTemplate('nature')" id="natureTemplate">自然</div>
+              <div class="template-option" onclick="selectTemplate('gradient')" id="gradientTemplate">渐变</div>
+              <div class="template-option" onclick="selectTemplate('dark')" id="darkTemplate">深色</div>
+            </div>
+          </div>
+          
+          <div class="admin-form-group">
+            <label class="admin-form-label">选择主题色</label>
+            <div class="color-options">
+              <div class="color-option active" style="background-color: #409EFF;" onclick="selectColor('#409EFF')" id="blueColor"></div>
+              <div class="color-option" style="background-color: #67C23A;" onclick="selectColor('#67C23A')" id="greenColor"></div>
+              <div class="color-option" style="background-color: #E6A23C;" onclick="selectColor('#E6A23C')" id="orangeColor"></div>
+              <div class="color-option" style="background-color: #F56C6C;" onclick="selectColor('#F56C6C')" id="redColor"></div>
+              <div class="color-option" style="background-color: #909399;" onclick="selectColor('#909399')" id="grayColor"></div>
+            </div>
+          </div>
+          
+          <div class="cover-preview">
+            <canvas id="coverCanvas" width="1200" height="630" style="max-width: 100%; height: auto;"></canvas>
+          </div>
+          
+          <div style="margin-top: 20px; display: flex; gap: 10px;">
+            <button class="admin-btn admin-btn-primary" onclick="generateCover()">
+              <i class="fas fa-sync-alt"></i> 重新生成
+            </button>
+            <button class="admin-btn admin-btn-success" onclick="downloadCover()">
+              <i class="fas fa-download"></i> 下载封面
+            </button>
+            <button class="admin-btn admin-btn-text" onclick="setAsDefault()">
+              <i class="fas fa-thumbtack"></i> 设为默认模板
+            </button>
+          </div>
+        </div>
+        
+        <!-- 模板库模式 -->
+        <div id="templateMode" style="display: none;">
+          <div class="admin-form-group">
+            <label class="admin-form-label">文章标题</label>
+            <input type="text" class="admin-form-input" placeholder="输入文章标题">
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <h3>选择模板</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 15px; margin-top: 15px;">
+              <div class="template-card" style="border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; cursor: pointer;">
+                <img src="https://via.placeholder.com/200x120/409EFF/FFFFFF?text=Template+1" style="width: 100%; height: 120px; object-fit: cover;">
+                <div style="padding: 10px;">
+                  <div style="font-weight: bold;">简约蓝</div>
+                  <div style="font-size: 12px; color: var(--text-hint);">简洁明快的设计风格</div>
+                </div>
+              </div>
+              
+              <div class="template-card" style="border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; cursor: pointer;">
+                <img src="https://via.placeholder.com/200x120/67C23A/FFFFFF?text=Template+2" style="width: 100%; height: 120px; object-fit: cover;">
+                <div style="padding: 10px;">
+                  <div style="font-weight: bold;">自然绿</div>
+                  <div style="font-size: 12px; color: var(--text-hint);">清新自然的设计风格</div>
+                </div>
+              </div>
+              
+              <div class="template-card" style="border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; cursor: pointer;">
+                <img src="https://via.placeholder.com/200x120/E6A23C/FFFFFF?text=Template+3" style="width: 100%; height: 120px; object-fit: cover;">
+                <div style="padding: 10px;">
+                  <div style="font-weight: bold;">温暖橙</div>
+                  <div style="font-size: 12px; color: var(--text-hint);">温暖活力的设计风格</div>
+                </div>
+              </div>
+              
+              <div class="template-card" style="border: 2px solid var(--border-color); border-radius: 8px; overflow: hidden; cursor: pointer;">
+                <img src="https://via.placeholder.com/200x120/F56C6C/FFFFFF?text=Template+4" style="width: 100%; height: 120px; object-fit: cover;">
+                <div style="padding: 10px;">
+                  <div style="font-weight: bold;">热情红</div>
+                  <div style="font-size: 12px; color: var(--text-hint);">热情奔放的设计风格</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div style="margin-top: 20px;">
+            <button class="admin-btn admin-btn-primary" disabled>
+              <i class="fas fa-magic"></i> 生成封面
+            </button>
+            <p style="color: var(--text-hint); font-size: 12px; margin-top: 10px;">
+              <i class="fas fa-info-circle"></i> 该功能仍在开发中，敬请期待
+            </p>
+          </div>
+        </div>
+        
+        <!-- AI生成模式 -->
+        <div id="aiMode" style="display: none;">
+          <div class="admin-form-group">
+            <label class="admin-form-label">文章标题</label>
+            <input type="text" class="admin-form-input" placeholder="输入文章标题">
+          </div>
+          
+          <div class="admin-form-group">
+            <label class="admin-form-label">风格描述 (可选)</label>
+            <textarea class="admin-form-textarea" placeholder="描述您想要的封面风格，例如：科技感、自然风光、扁平插画等"></textarea>
+          </div>
+          
+          <div class="admin-form-group">
+            <button class="admin-btn admin-btn-primary" disabled>
+              <i class="fas fa-magic"></i> AI生成封面
+            </button>
+            <p style="color: var(--text-hint); font-size: 12px; margin-top: 10px;">
+              <i class="fas fa-info-circle"></i> AI生成功能仍在开发中，敬请期待
+            </p>
+          </div>
+        </div>
+      </div>
+    </main>
+  </div>
+  
+  <script>
+    // 当前选择的模板和颜色
+    let currentTemplate = 'simple';
+    let currentColor = '#409EFF';
+    
+    // 页面加载完成后生成初始封面
+    document.addEventListener('DOMContentLoaded', function() {
+      // 生成初始封面
+      generateCover();
+    });
+    
+    // 切换生成方法
+    function switchMethod(method) {
+      // 隐藏所有模式
+      document.getElementById('titleMode').style.display = 'none';
+      document.getElementById('templateMode').style.display = 'none';
+      document.getElementById('aiMode').style.display = 'none';
+      
+      // 移除所有选项的active类
+      document.getElementById('titleOption').classList.remove('active');
+      document.getElementById('templateOption').classList.remove('active');
+      document.getElementById('aiOption').classList.remove('active');
+      
+      // 显示选择的模式
+      document.getElementById(`${method}Mode`).style.display = 'block';
+      document.getElementById(`${method}Option`).classList.add('active');
+    }
+    
+    // 选择模板
+    function selectTemplate(template) {
+      // 更新当前模板
+      currentTemplate = template;
+      
+      // 更新UI
+      document.querySelectorAll('.template-option').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById(`${template}Template`).classList.add('active');
+      
+      // 重新生成封面
+      generateCover();
+    }
+    
+    // 选择颜色
+    function selectColor(color) {
+      // 更新当前颜色
+      currentColor = color;
+      
+      // 更新UI
+      document.querySelectorAll('.color-option').forEach(el => {
+        el.classList.remove('active');
+      });
+      document.getElementById(`${color.substring(1)}Color`).classList.add('active');
+      
+      // 重新生成封面
+      generateCover();
+    }
+    
+    // 生成封面
+    function generateCover() {
+      const canvas = document.getElementById('coverCanvas');
+      const ctx = canvas.getContext('2d');
+      
+      // 清空画布
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      
+      // 获取标题和副标题
+      const title = document.getElementById('coverTitle').value || '使用Hexo搭建个人技术博客';
+      const subtitle = document.getElementById('coverSubtitle').value || '技术分享 · 个人成长';
+      
+      // 根据模板绘制背景
+      switch (currentTemplate) {
+        case 'simple':
+          // 简约风格
+          ctx.fillStyle = '#ffffff';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // 顶部装饰
+          ctx.fillStyle = currentColor;
+          ctx.fillRect(0, 0, canvas.width, 10);
+          
+          break;
+          
+        case 'tech':
+          // 科技风格
+          ctx.fillStyle = '#2c3e50';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // 绘制网格线
+          ctx.strokeStyle = 'rgba(255, 255, 255, 0.1)';
+          ctx.lineWidth = 1;
+          
+          // 横线
+          for (let y = 50; y < canvas.height; y += 50) {
+            ctx.beginPath();
+            ctx.moveTo(0, y);
+            ctx.lineTo(canvas.width, y);
+            ctx.stroke();
+          }
+          
+          // 竖线
+          for (let x = 50; x < canvas.width; x += 50) {
+            ctx.beginPath();
+            ctx.moveTo(x, 0);
+            ctx.lineTo(x, canvas.height);
+            ctx.stroke();
+          }
+          
+          // 绘制点
+          ctx.fillStyle = currentColor;
+          for (let x = 50; x < canvas.width; x += 100) {
+            for (let y = 50; y < canvas.height; y += 100) {
+              ctx.beginPath();
+              ctx.arc(x, y, 3, 0, Math.PI * 2);
+              ctx.fill();
+            }
+          }
+          
+          break;
+          
+        case 'nature':
+          // 自然风格
+          ctx.fillStyle = '#f8f9fa';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // 绘制装饰
+          ctx.fillStyle = '#e9ecef';
+          ctx.beginPath();
+          ctx.moveTo(0, canvas.height * 0.7);
+          ctx.quadraticCurveTo(canvas.width * 0.5, canvas.height * 0.5, canvas.width, canvas.height * 0.8);
+          ctx.lineTo(canvas.width, canvas.height);
+          ctx.lineTo(0, canvas.height);
+          ctx.closePath();
+          ctx.fill();
+          
+          ctx.fillStyle = currentColor;
+          ctx.globalAlpha = 0.2;
+          ctx.beginPath();
+          ctx.moveTo(0, canvas.height * 0.8);
+          ctx.quadraticCurveTo(canvas.width * 0.3, canvas.height * 0.6, canvas.width, canvas.height * 0.7);
+          ctx.lineTo(canvas.width, canvas.height);
+          ctx.lineTo(0, canvas.height);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          
+          break;
+          
+        case 'gradient':
+          // 渐变风格
+          const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+          gradient.addColorStop(0, currentColor);
+          gradient.addColorStop(1, shiftColor(currentColor, 40));
+          ctx.fillStyle = gradient;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          break;
+          
+        case 'dark':
+          // 深色风格
+          ctx.fillStyle = '#212529';
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          
+          // 绘制装饰
+          ctx.fillStyle = '#343a40';
+          ctx.beginPath();
+          ctx.moveTo(0, 0);
+          ctx.lineTo(canvas.width * 0.7, 0);
+          ctx.lineTo(canvas.width * 0.3, canvas.height);
+          ctx.lineTo(0, canvas.height);
+          ctx.closePath();
+          ctx.fill();
+          
+          ctx.fillStyle = currentColor;
+          ctx.globalAlpha = 0.2;
+          ctx.beginPath();
+          ctx.moveTo(canvas.width, 0);
+          ctx.lineTo(canvas.width * 0.5, 0);
+          ctx.lineTo(canvas.width * 0.8, canvas.height);
+          ctx.lineTo(canvas.width, canvas.height);
+          ctx.closePath();
+          ctx.fill();
+          ctx.globalAlpha = 1;
+          
+          break;
+      }
+      
+      // 绘制标题
+      ctx.fillStyle = currentTemplate === 'dark' || currentTemplate === 'tech' ? '#ffffff' : '#333333';
+      ctx.font = 'bold 60px Arial';
+      ctx.textAlign = 'center';
+      
+      // 处理长标题换行
+      const words = title.split(' ');
+      let lines = [];
+      let currentLine = words[0];
+      
+      for (let i = 1; i < words.length; i++) {
+        const testLine = currentLine + ' ' + words[i];
+        const metrics = ctx.measureText(testLine);
+        
+        if (metrics.width > canvas.width * 0.8) {
+          lines.push(currentLine);
+          currentLine = words[i];
+        } else {
+          currentLine = testLine;
+        }
+      }
+      
+      lines.push(currentLine);
+      
+      // 绘制标题行
+      const lineHeight = 70;
+      const startY = canvas.height / 2 - (lines.length - 1) * lineHeight / 2;
+      
+      lines.forEach((line, index) => {
+        ctx.fillText(line, canvas.width / 2, startY + index * lineHeight);
+      });
+      
+      // 绘制副标题
+      ctx.fillStyle = currentTemplate === 'dark' || currentTemplate === 'tech' ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.6)';
+      ctx.font = '30px Arial';
+      ctx.fillText(subtitle, canvas.width / 2, startY + lines.length * lineHeight + 40);
+      
+      // 绘制装饰线
+      ctx.strokeStyle = currentColor;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(canvas.width / 2 - 50, startY + lines.length * lineHeight + 60);
+      ctx.lineTo(canvas.width / 2 + 50, startY + lines.length * lineHeight + 60);
+      ctx.stroke();
+      
+      // 绘制博客名称或水印
+      ctx.fillStyle = currentTemplate === 'dark' || currentTemplate === 'tech' ? 'rgba(255, 255, 255, 0.3)' : 'rgba(0, 0, 0, 0.2)';
+      ctx.font = '20px Arial';
+      ctx.textAlign = 'right';
+      ctx.fillText('我的博客 · myblog.com', canvas.width - 50, canvas.height - 30);
+    }
+    
+    // 下载封面
+    function downloadCover() {
+      const canvas = document.getElementById('coverCanvas');
+      const title = document.getElementById('coverTitle').value || '博客封面';
+      
+      // 创建下载链接
+      const link = document.createElement('a');
+      link.download = `${title.replace(/\s+/g, '-')}-cover.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+    
+    // 设为默认模板
+    function setAsDefault() {
+      alert('已将当前设置保存为默认模板');
+      
+      // 保存设置到localStorage
+      localStorage.setItem('defaultCoverTemplate', JSON.stringify({
+        template: currentTemplate,
+        color: currentColor
+      }));
+    }
+    
+    // 辅助函数：调整颜色明暗
+    function shiftColor(color, amount) {
+      // 解析颜色
+      let r = parseInt(color.substring(1, 3), 16);
+      let g = parseInt(color.substring(3, 5), 16);
+      let b = parseInt(color.substring(5, 7), 16);
+      
+      // 调整
+      r = Math.max(0, Math.min(255, r + amount));
+      g = Math.max(0, Math.min(255, g + amount));
+      b = Math.max(0, Math.min(255, b + amount));
+      
+      // 转回十六进制
+      return '#' + ((1 << 24) + (r << 16) + (g << 8) + b).toString(16).slice(1);
+    }
+    
+    // 注销
+    function logout() {
+      localStorage.removeItem('adminLoggedIn');
+      window.location.href = '/admin/login.html';
+    }
+  </script>
+</body>
+</html> 

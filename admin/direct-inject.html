@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Inject Script</title>
+</head>
+  <link rel="stylesheet" href="/admin/css/fix-background.css">
+  
+<body>
+  <script>
+    (function() {
+      // 创建脚本元素
+      const script = document.createElement('script');
+      script.src = '/admin/myadmin-inject.js';
+      
+      // 添加到父窗口
+      try {
+        if (window.parent && window.parent.document) {
+          window.parent.document.head.appendChild(script);
+          document.body.innerHTML = '<p style="color:green">注入成功!</p>';
+        } else {
+          document.body.innerHTML = '<p style="color:red">无法访问父窗口!</p>';
+        }
+      } catch (e) {
+        document.body.innerHTML = '<p style="color:red">注入失败: ' + e.message + '</p>';
+      }
+    })();
+  </script>
+</body>
+</html> 
